@@ -1,210 +1,166 @@
-// Main script for interactive elements
+// Main script file for interactive elements and effects
+
+// Sound effects for interactions
+let hoverSound, clickSound, successSound;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all interactive elements
-    createHearts();
-    createBalloons();
+    // Initialize sound effects
+    hoverSound = new Tone.Player({
+        url: "https://tonejs.github.io/audio/berklee/tap_mellow.mp3",
+        volume: -10
+    }).toDestination();
     
-    // Add hover sound effect to buttons
-    const buttons = document.querySelectorAll('.btn');
-    buttons.forEach(button => {
-        button.addEventListener('mouseenter', playHoverSound);
-        button.addEventListener('click', playClickSound);
-    });
+    clickSound = new Tone.Player({
+        url: "https://tonejs.github.io/audio/berklee/tap_cool.mp3",
+        volume: -5
+    }).toDestination();
     
-    // Add gift selection functionality
-    const giftOptions = document.querySelectorAll('.gift-option-btn');
-    giftOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            const giftValue = this.getAttribute('data-gift');
-            const giftForm = document.getElementById('gift-form');
-            if (giftForm) {
-                const hiddenInput = giftForm.querySelector('input[name="gift"]');
-                if (hiddenInput) {
-                    hiddenInput.value = giftValue;
-                }
-                giftForm.submit();
-            }
-        });
-    });
-    
-    // Add idea tag functionality for message suggestions
-    const ideaTags = document.querySelectorAll('.idea-tag');
-    ideaTags.forEach(tag => {
-        tag.addEventListener('click', function() {
-            const messageText = this.textContent;
-            const messageTextarea = document.getElementById('message-text');
-            if (messageTextarea) {
-                if (messageTextarea.value) {
-                    messageTextarea.value += ' ' + messageText;
-                } else {
-                    messageTextarea.value = messageText;
-                }
-                messageTextarea.focus();
-            }
-        });
-    });
-    
-    // Handle custom gift submission
-    const customGiftForm = document.getElementById('custom-gift-form');
-    if (customGiftForm) {
-        customGiftForm.addEventListener('submit', function(e) {
-            const customGiftInput = document.getElementById('custom-gift-input');
-            if (customGiftInput && !customGiftInput.value.trim()) {
-                e.preventDefault();
-                alert('Please describe your gift wish!');
-                customGiftInput.focus();
-            } else {
-                playSuccessSound();
-            }
-        });
-    }
-    
-    // Add animation to confirmed gift on final page
-    const confirmedGift = document.querySelector('.confirmed-gift');
-    if (confirmedGift) {
-        confirmedGift.classList.add('float-animation');
-    }
-    
-    // Create confetti effect on final page
-    const celebrationTitle = document.querySelector('.celebration-title');
-    if (celebrationTitle) {
-        createConfetti();
-    }
+    successSound = new Tone.Player({
+        url: "https://tonejs.github.io/audio/berklee/guitar_chord.mp3",
+        volume: -5
+    }).toDestination();
 });
 
-// Sound effect functions
 function playHoverSound() {
-    const hoverSound = new Tone.Synth({
-        oscillator: { type: 'sine' },
-        envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
-    }).toDestination();
-    hoverSound.volume.value = -20;
-    hoverSound.triggerAttackRelease('C6', '32n');
+    if (hoverSound && hoverSound.loaded) {
+        hoverSound.start();
+    }
 }
 
 function playClickSound() {
-    const clickSound = new Tone.Synth({
-        oscillator: { type: 'sine' },
-        envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.1 }
-    }).toDestination();
-    clickSound.volume.value = -15;
-    clickSound.triggerAttackRelease('G5', '16n');
+    if (clickSound && clickSound.loaded) {
+        clickSound.start();
+    }
 }
 
 function playSuccessSound() {
-    const successSynth = new Tone.PolySynth(Tone.Synth).toDestination();
-    successSynth.volume.value = -15;
-    successSynth.triggerAttackRelease(['C5', 'E5', 'G5'], '8n');
-    setTimeout(() => {
-        successSynth.triggerAttackRelease(['D5', 'F5', 'A5'], '8n');
-    }, 150);
-    setTimeout(() => {
-        successSynth.triggerAttackRelease(['E5', 'G5', 'B5'], '8n');
-    }, 300);
-    setTimeout(() => {
-        successSynth.triggerAttackRelease(['C6'], '4n');
-    }, 450);
+    if (successSound && successSound.loaded) {
+        successSound.start();
+    }
 }
 
-// Visual effect functions
+// Create decorative heart elements
 function createHearts() {
-    const heartsContainer = document.querySelector('.hearts-container');
-    if (!heartsContainer) return;
-    
-    const heartCount = 15;
-    
-    for (let i = 0; i < heartCount; i++) {
-        const heart = document.createElement('img');
-        heart.src = '/static/images/heart.svg';
-        heart.alt = '♥';
-        heart.className = 'heart';
-        
-        // Random position
-        const left = Math.random() * 100;
-        const top = Math.random() * 100;
-        heart.style.left = `${left}%`;
-        heart.style.top = `${top}%`;
-        
-        // Random size
-        const size = 15 + Math.random() * 20;
-        heart.style.width = `${size}px`;
-        heart.style.height = `${size}px`;
-        
-        // Random animation duration
-        const duration = 5 + Math.random() * 10;
-        heart.style.animation = `float ${duration}s infinite ease-in-out ${Math.random() * 5}s`;
-        
-        heartsContainer.appendChild(heart);
-    }
-}
-
-function createBalloons() {
-    const balloonsContainer = document.querySelector('.balloons-container');
-    if (!balloonsContainer) return;
-    
-    const balloonCount = 8;
-    
-    for (let i = 0; i < balloonCount; i++) {
-        const balloon = document.createElement('img');
-        balloon.src = '/static/images/balloon.svg';
-        balloon.alt = '🎈';
-        balloon.className = 'balloon';
-        
-        // Random position
-        const left = Math.random() * 100;
-        balloon.style.left = `${left}%`;
-        balloon.style.top = `110%`; // Start below the screen
-        
-        // Random size
-        const size = 40 + Math.random() * 30;
-        balloon.style.width = `${size}px`;
-        
-        // Randomize animation
-        const delay = Math.random() * 15;
-        const duration = 15 + Math.random() * 20;
-        balloon.style.animation = `float-up ${duration}s linear ${delay}s infinite`;
-        
-        balloonsContainer.appendChild(balloon);
-    }
-}
-
-function createConfetti() {
-    const container = document.querySelector('.content-wrapper');
+    const container = document.getElementById('hearts-container');
     if (!container) return;
     
-    const confettiCount = 100;
-    const colors = ['#ff6b6b', '#4ecdc4', '#ffbe0b', '#a66cff', '#3bceac'];
+    const heartCount = 15;
+    const heartSVG = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="rgba(255, 99, 132, 0.7)"/>
+        </svg>
+    `;
+    
+    for (let i = 0; i < heartCount; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.innerHTML = heartSVG;
+        
+        // Randomize position and animation
+        const left = Math.random() * 100;
+        const size = Math.random() * 20 + 10;
+        const animDuration = Math.random() * 10 + 5;
+        const animDelay = Math.random() * 5;
+        
+        heart.style.left = `${left}%`;
+        heart.style.top = `${Math.random() * 100}%`;
+        heart.style.width = `${size}px`;
+        heart.style.height = `${size}px`;
+        heart.style.animation = `float ${animDuration}s ease-in-out ${animDelay}s infinite`;
+        heart.style.opacity = Math.random() * 0.5 + 0.3;
+        
+        container.appendChild(heart);
+    }
+}
+
+// Create decorative balloon elements
+function createBalloons() {
+    const container = document.getElementById('balloons-container');
+    if (!container) return;
+    
+    const balloonCount = 8;
+    const balloonColors = [
+        'rgba(255, 99, 132, 0.7)', // pink
+        'rgba(54, 162, 235, 0.7)',  // blue
+        'rgba(255, 206, 86, 0.7)',  // yellow
+        'rgba(75, 192, 192, 0.7)',  // teal
+        'rgba(153, 102, 255, 0.7)'  // purple
+    ];
+    
+    for (let i = 0; i < balloonCount; i++) {
+        const balloon = document.createElement('div');
+        balloon.classList.add('balloon');
+        
+        // Create balloon SVG
+        const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+        const balloonSVG = `
+            <svg width="30" height="40" viewBox="0 0 30 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 0C7.5 0 1.5 6 1.5 13.5C1.5 21 7.5 30 15 36C22.5 30 28.5 21 28.5 13.5C28.5 6 22.5 0 15 0Z" fill="${color}"/>
+                <path d="M15 36V40" stroke="gray" stroke-width="1.5"/>
+            </svg>
+        `;
+        
+        balloon.innerHTML = balloonSVG;
+        
+        // Randomize position and animation
+        const left = Math.random() * 100;
+        const size = Math.random() * 30 + 20;
+        const animDuration = Math.random() * 15 + 10;
+        const animDelay = Math.random() * 5;
+        
+        balloon.style.left = `${left}%`;
+        balloon.style.top = `${Math.random() * 50}%`;
+        balloon.style.width = `${size}px`;
+        balloon.style.height = `${size * 1.5}px`;
+        balloon.style.animation = `float ${animDuration}s ease-in-out ${animDelay}s infinite`;
+        
+        container.appendChild(balloon);
+    }
+}
+
+// Create confetti celebration effect
+function createConfetti() {
+    const confettiCount = 150;
+    const container = document.body;
+    const colors = [
+        '#FF6B6B', '#4ECDC4', '#FFD166', '#FF8CC6', '#48BEFF', '#6A0572'
+    ];
     
     for (let i = 0; i < confettiCount; i++) {
         const confetti = document.createElement('div');
-        confetti.className = 'confetti';
+        confetti.classList.add('confetti');
         
-        // Random color
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        const size = Math.random() * 10 + 5;
+        const color = colors[Math.floor(Math.random() * colors.length)];
         
-        // Random position
-        confetti.style.left = `${Math.random() * 100}%`;
-        confetti.style.top = '-10px';
-        
-        // Random size
-        const size = 5 + Math.random() * 10;
         confetti.style.width = `${size}px`;
         confetti.style.height = `${size}px`;
+        confetti.style.backgroundColor = color;
         
-        // Random rotation
+        // Position confetti
+        confetti.style.top = '0';
+        confetti.style.left = `${Math.random() * 100}%`;
+        
+        // Apply animation with random duration
+        const animationDuration = Math.random() * 3 + 2;
+        confetti.style.animation = `fall ${animationDuration}s linear forwards`;
+        
+        // Add rotation
         confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
         
-        // Animation
-        const delay = Math.random() * 5;
-        const duration = 4 + Math.random() * 4;
-        confetti.style.animation = `fall ${duration}s linear ${delay}s`;
+        // Add delay
+        confetti.style.animationDelay = `${Math.random() * 1.5}s`;
         
         container.appendChild(confetti);
         
         // Remove confetti after animation
         setTimeout(() => {
             confetti.remove();
-        }, (delay + duration) * 1000);
+        }, animationDuration * 1000 + 2000);
     }
+    
+    // Play celebration sound
+    setTimeout(() => {
+        playSuccessSound();
+    }, 200);
 }
