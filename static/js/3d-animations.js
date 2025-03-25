@@ -7,119 +7,30 @@ let heartModel;
 let heartParticles = [];
 let canvasContainer;
 let floatingHearts = [];
-let ring1, ring2, ringBox;
+let ring1, ring2;
 let isAnimating = false;
 let messageBox;
-let clock, mixer;
+let clock;
 
 
-// Create floating heart geometries
-function createFloatingHeart() {
-    const heartShape = new THREE.Shape();
-    heartShape.moveTo(0, 0);
-    heartShape.bezierCurveTo(0, 3, 3, 3, 3, 0);
-    heartShape.bezierCurveTo(3, -1, 0, -2, 0, -3);
-    heartShape.bezierCurveTo(0, -2, -3, -1, -3, 0);
-    heartShape.bezierCurveTo(-3, 3, 0, 3, 0, 0);
-
-    const geometry = new THREE.ShapeGeometry(heartShape);
-    const material = new THREE.MeshPhongMaterial({
-        color: 0xff69b4,
-        shininess: 100,
-        transparent: true,
-        opacity: 0.8
-    });
-
-    const heart = new THREE.Mesh(geometry, material);
-    heart.scale.set(0.1, 0.1, 0.1);
-    heart.position.set(
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10
-    );
-    scene.add(heart);
-    floatingHearts.push(heart);
-}
-
-// Create ring geometry
-function createRing() {
-    const geometry = new THREE.TorusGeometry(2, 0.1, 16, 100);
-    const material = new THREE.MeshPhongMaterial({
-        color: 0xff69b4,
-        shininess: 100,
-        transparent: true,
-        opacity: 0.5
-    });
-    ring = new THREE.Mesh(geometry, material);
-    scene.add(ring);
-}
-
-// Animation loop
-function animate() {
-    requestAnimationFrame(animate);
-
-    if (controls) controls.update();
-
-    // Rotate ring
-    if (ring) {
-        ring.rotation.x += 0.01;
-        ring.rotation.y += 0.01;
-    }
-
-    // Animate floating hearts
-    floatingHearts.forEach(heart => {
-        heart.rotation.z += 0.02;
-        heart.position.y += Math.sin(Date.now() * 0.001) * 0.01;
-    });
-
-    // Pulse heart model
-    if (heartModel) {
-        heartModel.rotation.y += 0.01; 
-        heartModel.scale.x = 0.2 + Math.sin(Date.now() * 0.002) * 0.02; 
-        heartModel.scale.y = 0.2 + Math.sin(Date.now() * 0.002) * 0.02;
-        heartModel.scale.z = 0.2 + Math.sin(Date.now() * 0.002) * 0.02;
-    }
-
-    // Update particles
-    heartParticles.forEach((particle, index) => {
-        particle.position.y += 0.05; 
-        particle.material.opacity -= 0.02; 
-
-        if (particle.material.opacity <= 0) {
-            scene.remove(particle);
-            heartParticles.splice(index, 1);
-        }
-    });
-
-    // Gentle floating animation for message box
-    if (messageBox) {
-        messageBox.position.y = 2 + Math.sin(Date.now() * 0.001) * 0.1;
-    }
-
-    if (renderer && scene && camera) {
-        renderer.render(scene, camera);
-    }
-}
-
-// Initialize the 3D scene
 function init3DScene() {
-    // Get the container for the 3D scene
     canvasContainer = document.getElementById('canvas-container');
     if (!canvasContainer) return;
 
-    // Create scene
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xfff0f5); // Light pink background
+    scene.background = new THREE.Color(0xfff0f5);
 
-    // Create camera
     camera = new THREE.PerspectiveCamera(75, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
     camera.position.z = 5;
 
-    // Create renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     canvasContainer.appendChild(renderer.domElement);
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
 
     // Add lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -129,7 +40,24 @@ function init3DScene() {
     directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
 
-    // Create heart model
+    createHeartModel();
+    createFloatingHearts();
+    createRings();
+    createMessageBox();
+
+    window.addEventListener('resize', onWindowResize);
+    animate();
+}
+
+function onWindowResize() {
+    if (!canvasContainer || !camera || !renderer) return;
+
+    camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+}
+
+function createHeartModel() {
     const heartShape = new THREE.Shape();
     heartShape.moveTo(0, 0);
     heartShape.bezierCurveTo(0, 3, 3, 3, 3, 0);
@@ -154,17 +82,38 @@ function init3DScene() {
     heartModel = new THREE.Mesh(heartGeometry, heartMaterial);
     heartModel.scale.set(0.2, 0.2, 0.2);
     scene.add(heartModel);
+}
 
-
-    // Add floating hearts
+function createFloatingHearts() {
     for (let i = 0; i < 10; i++) {
-        createFloatingHeart();
+        const heartShape = new THREE.Shape();
+        heartShape.moveTo(0, 0);
+        heartShape.bezierCurveTo(0, 3, 3, 3, 3, 0);
+        heartShape.bezierCurveTo(3, -1, 0, -2, 0, -3);
+        heartShape.bezierCurveTo(0, -2, -3, -1, -3, 0);
+        heartShape.bezierCurveTo(-3, 3, 0, 3, 0, 0);
+
+        const geometry = new THREE.ShapeGeometry(heartShape);
+        const material = new THREE.MeshPhongMaterial({
+            color: 0xff69b4,
+            shininess: 100,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        const heart = new THREE.Mesh(geometry, material);
+        heart.scale.set(0.1, 0.1, 0.1);
+        heart.position.set(
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 10
+        );
+        scene.add(heart);
+        floatingHearts.push(heart);
     }
+}
 
-    // Add ring
-    createRing();
-
-    // Create rings
+function createRings() {
     const ringGeometry = new THREE.TorusGeometry(0.5, 0.05, 16, 100);
     const goldMaterial = new THREE.MeshStandardMaterial({
         color: 0xffd700,
@@ -180,8 +129,9 @@ function init3DScene() {
 
     scene.add(ring1);
     scene.add(ring2);
+}
 
-    // Create message box
+function createMessageBox() {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     canvas.width = 512;
@@ -193,7 +143,7 @@ function init3DScene() {
     context.font = '32px Arial';
     context.fillStyle = '#ff69b4';
     context.textAlign = 'center';
-    context.fillText('Click to exchange rings!', canvas.width / 2, canvas.height / 2);
+    context.fillText('Exchange rings with your loved one!', canvas.width / 2, canvas.height / 2);
 
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.MeshBasicMaterial({
@@ -201,34 +151,45 @@ function init3DScene() {
         transparent: true
     });
 
-    const geometry = new THREE.PlaneGeometry(3, 0.75);
+    const geometry = new THREE.PlaneGeometry(4, 1);
     messageBox = new THREE.Mesh(geometry, material);
     messageBox.position.y = 2;
     scene.add(messageBox);
-
-    // Add orbit controls
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.rotateSpeed = 0.5;
-
-    // Handle window resize
-    window.addEventListener('resize', onWindowResize);
-
-    // Start animation loop
-    animate();
-
-    // Add click handler for the ring to trigger special animation
-    renderer.domElement.addEventListener('click', onRingClick);
 }
 
-// Handle window resizing
-function onWindowResize() {
-    if (!canvasContainer) return;
+function animate() {
+    requestAnimationFrame(animate);
 
-    camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+    if (controls) controls.update();
+
+    if (ring1) {
+        ring1.rotation.x += 0.01;
+        ring1.rotation.y += 0.01;
+    }
+
+    if (ring2) {
+        ring2.rotation.x += 0.01;
+        ring2.rotation.y += 0.01;
+    }
+
+    floatingHearts.forEach(heart => {
+        heart.rotation.z += 0.02;
+        heart.position.y += Math.sin(Date.now() * 0.001) * 0.01;
+    });
+
+    if (heartModel) {
+        heartModel.rotation.y += 0.01;
+        const scale = 0.2 + Math.sin(Date.now() * 0.002) * 0.02;
+        heartModel.scale.set(scale, scale, scale);
+    }
+
+    if (messageBox) {
+        messageBox.position.y = 2 + Math.sin(Date.now() * 0.001) * 0.1;
+    }
+
+    if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+    }
 }
 
 // Create heart-shaped particles
