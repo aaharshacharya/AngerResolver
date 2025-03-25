@@ -240,14 +240,8 @@ function onWindowResize() {
     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
 }
 
-// Animation loop
-function animate() {
-    requestAnimationFrame(animate);
-    
-    // Update controls
-    if (controls) controls.update();
-    
-    // Animate particles
+// Update particle animations
+function updateParticles() {
     heartParticles.forEach(particle => {
         // Rotate particle around its own axis
         particle.rotation.x += particle.userData.rotationSpeed;
@@ -267,9 +261,6 @@ function animate() {
         // Adjust opacity for twinkling effect
         particle.material.opacity = 0.3 + 0.5 * Math.sin(Date.now() * 0.001 + particle.position.x);
     });
-    
-    // Render the scene
-    if (renderer) renderer.render(scene, camera);
 }
 
 // Floating heart animation with GSAP
