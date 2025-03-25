@@ -6,76 +6,6 @@ let scene, camera, renderer, controls;
 let heartModel, clock, mixer;
 let heartParticles = [];
 let canvasContainer;
-let ring;
-let floatingHearts = [];
-
-// Create floating heart geometries
-function createFloatingHeart() {
-    const heartShape = new THREE.Shape();
-    heartShape.moveTo(0, 0);
-    heartShape.bezierCurveTo(0, 3, 3, 3, 3, 0);
-    heartShape.bezierCurveTo(3, -1, 0, -2, 0, -3);
-    heartShape.bezierCurveTo(0, -2, -3, -1, -3, 0);
-    heartShape.bezierCurveTo(-3, 3, 0, 3, 0, 0);
-
-    const geometry = new THREE.ShapeGeometry(heartShape);
-    const material = new THREE.MeshPhongMaterial({
-        color: 0xff69b4,
-        shininess: 100,
-        transparent: true,
-        opacity: 0.8
-    });
-    
-    const heart = new THREE.Mesh(geometry, material);
-    heart.scale.set(0.1, 0.1, 0.1);
-    heart.position.set(
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10
-    );
-    scene.add(heart);
-    floatingHearts.push(heart);
-}
-
-// Create ring geometry
-function createRing() {
-    const geometry = new THREE.TorusGeometry(2, 0.1, 16, 100);
-    const material = new THREE.MeshPhongMaterial({
-        color: 0xff69b4,
-        shininess: 100,
-        transparent: true,
-        opacity: 0.5
-    });
-    ring = new THREE.Mesh(geometry, material);
-    scene.add(ring);
-}
-
-// Animation loop
-function animate() {
-    requestAnimationFrame(animate);
-    
-    // Rotate ring
-    if (ring) {
-        ring.rotation.x += 0.01;
-        ring.rotation.y += 0.01;
-    }
-    
-    // Animate floating hearts
-    floatingHearts.forEach(heart => {
-        heart.rotation.z += 0.02;
-        heart.position.y += Math.sin(Date.now() * 0.001) * 0.01;
-    });
-    
-    // Pulse heart model
-    if (heartModel) {
-        heartModel.scale.x = 1 + Math.sin(Date.now() * 0.002) * 0.1;
-        heartModel.scale.y = 1 + Math.sin(Date.now() * 0.002) * 0.1;
-        heartModel.scale.z = 1 + Math.sin(Date.now() * 0.002) * 0.1;
-    }
-    
-    controls.update();
-    renderer.render(scene, camera);
-}
 
 // Initialize the 3D scene
 function init3DScene() {
@@ -86,17 +16,6 @@ function init3DScene() {
     // Create scene, camera, and renderer
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xfff0f5); // Light pink background
-    
-    // Add floating hearts
-    for (let i = 0; i < 10; i++) {
-        createFloatingHeart();
-    }
-    
-    // Add ring
-    createRing();
-    
-    // Start animation loop
-    animate();
     
     // Create camera
     camera = new THREE.PerspectiveCamera(75, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
