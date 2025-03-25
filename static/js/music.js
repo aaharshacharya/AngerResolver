@@ -6,7 +6,7 @@ let musicPlaying = false;
 function initializeBackgroundMusic() {
     // Create audio player for the mp3 file
     backgroundMusic = new Tone.Player({
-        url: "/static/audio/ahatamatarmusic.mp3",
+        url: "/static/audio/background-song.mp3",
         loop: true,
         volume: -10,
         autostart: false,
