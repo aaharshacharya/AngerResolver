@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card custom-card">
+    <div class="card-body text-center">
+        <h1 class="animated-title">Your Perfect Gift <span class="emoji">✨</span></h1>
+        <p class="subtitle">Tell me what would make you happy...</p>
+        
+        <div class="custom-form">
+            <form action="{{ url_for('custom') }}" method="post">
+                <div class="form-floating mb-4">
+                    <input type="text" class="form-control" id="custom_gift" name="custom_gift" placeholder="Your dream gift" required>
+                    <label for="custom_gift">What would you like?</label>
+                </div>
+                
+                <button type="submit" class="btn btn-lg btn-primary float-animation">
+                    That's My Choice <i class="fas fa-check-circle ms-2"></i>
+                </button>
+            </form>
+        </div>
+        
+        <div class="gift-ideas mt-4">
+            <p>Need some ideas?</p>
+            <div class="ideas-container">
+                <span class="idea-tag" onclick="fillIdea('Ice Cream Date')">Ice Cream Date</span>
+                <span class="idea-tag" onclick="fillIdea('Coffee & Cuddles')">Coffee & Cuddles</span>
+                <span class="idea-tag" onclick="fillIdea('Picnic in the Park')">Picnic in the Park</span>
+                <span class="idea-tag" onclick="fillIdea('Stargazing Night')">Stargazing Night</span>
+                <span class="idea-tag" onclick="fillIdea('Cooking Together')">Cooking Together</span>
+            </div>
+        </div>
+        
+        <div class="navigation-links mt-4">
+            <a href="{{ url_for('choose') }}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Go Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function fillIdea(idea) {
+        document.getElementById('custom_gift').value = idea;
+    }
+</script>
+{% endblock %}

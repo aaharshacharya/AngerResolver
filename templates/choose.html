@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card choose-card">
+    <div class="card-body text-center">
+        <h1 class="animated-title">Pick Your Gift <span class="emoji">🎁</span></h1>
+        <p class="subtitle">What would make you happy today?</p>
+        
+        <div class="gift-options">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <form action="{{ url_for('message') }}" method="post">
+                        <input type="hidden" name="gift" value="Dinner Date">
+                        <button type="submit" class="gift-option-btn">
+                            <div class="gift-icon">🍽️</div>
+                            <div class="gift-name">Dinner Date</div>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="col-md-4">
+                    <form action="{{ url_for('message') }}" method="post">
+                        <input type="hidden" name="gift" value="Movie Night">
+                        <button type="submit" class="gift-option-btn">
+                            <div class="gift-icon">🎬</div>
+                            <div class="gift-name">Movie Night</div>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="col-md-4">
+                    <form action="{{ url_for('message') }}" method="post">
+                        <input type="hidden" name="gift" value="Shopping Spree">
+                        <button type="submit" class="gift-option-btn">
+                            <div class="gift-icon">🛍️</div>
+                            <div class="gift-name">Shopping Spree</div>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="col-md-4">
+                    <form action="{{ url_for('message') }}" method="post">
+                        <input type="hidden" name="gift" value="Spa Day">
+                        <button type="submit" class="gift-option-btn">
+                            <div class="gift-icon">💆‍♀️</div>
+                            <div class="gift-name">Spa Day</div>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="col-md-4">
+                    <form action="{{ url_for('message') }}" method="post">
+                        <input type="hidden" name="gift" value="Beach Trip">
+                        <button type="submit" class="gift-option-btn">
+                            <div class="gift-icon">🏖️</div>
+                            <div class="gift-name">Beach Trip</div>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="col-md-4">
+                    <form action="{{ url_for('message') }}" method="post">
+                        <input type="hidden" name="gift" value="Museum Visit">
+                        <button type="submit" class="gift-option-btn">
+                            <div class="gift-icon">🏛️</div>
+                            <div class="gift-name">Museum Visit</div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="custom-option mt-4">
+            <p>Don't see what you want?</p>
+            <a href="{{ url_for('custom') }}" class="btn btn-outline-primary float-animation">
+                Suggest Your Own Gift <i class="fas fa-gift ms-2"></i>
+            </a>
+        </div>
+        
+        <div class="navigation-links mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Go Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

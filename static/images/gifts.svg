@@ -1,0 +1,31 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gift box -->
+  <rect x="40" y="80" width="120" height="90" rx="5" fill="#ff6b6b" stroke="#d63031" stroke-width="3"/>
+  
+  <!-- Box lid -->
+  <rect x="30" y="60" width="140" height="30" rx="5" fill="#ff6b6b" stroke="#d63031" stroke-width="3"/>
+  
+  <!-- Ribbon vertical -->
+  <rect x="90" y="60" width="20" height="110" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  
+  <!-- Ribbon horizontal -->
+  <rect x="30" y="85" width="140" height="20" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  
+  <!-- Bow left -->
+  <ellipse cx="75" cy="65" rx="25" ry="15" transform="rotate(-15 75 65)" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  
+  <!-- Bow right -->
+  <ellipse cx="125" cy="65" rx="25" ry="15" transform="rotate(15 125 65)" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  
+  <!-- Bow center -->
+  <circle cx="100" cy="60" r="10" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  
+  <!-- Sparkles -->
+  <g fill="#ffbe0b">
+    <polygon points="30,30 35,35 30,40 25,35" />
+    <polygon points="170,40 175,45 170,50 165,45" />
+    <polygon points="60,20 65,25 60,30 55,25" />
+    <polygon points="140,20 145,25 140,30 135,25" />
+    <polygon points="100,10 105,15 100,20 95,15" />
+  </g>
+</svg>

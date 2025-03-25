@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card welcome-card">
+    <div class="card-body text-center">
+        <h1 class="animated-title">Hey You! <span class="emoji">😡</span></h1>
+        <div class="subtitle bounce-animation">
+            <p>I know you're upset with me...</p>
+        </div>
+        
+        <div class="message-box">
+            <p>But I've prepared something special just for you!</p>
+            <p>Let me make it up to you with a gift...</p>
+            <p class="hint">(I promise it will make you smile)</p>
+        </div>
+        
+        <a href="{{ url_for('choose') }}" class="btn btn-lg btn-primary float-animation">
+            Let's Make Up <i class="fas fa-heart ms-2"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}
