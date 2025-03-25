@@ -1,6 +1,8 @@
 import os
 import logging
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+import json
+from datetime import datetime, timedelta
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -13,6 +15,11 @@ app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/long-distance')
+def long_distance():
+    # This is our new page for long-distance relationship features
+    return render_template('long_distance.html')
 
 @app.route('/choose')
 def choose():

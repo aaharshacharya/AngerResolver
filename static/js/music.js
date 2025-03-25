@@ -4,12 +4,19 @@ let backgroundMusic;
 let musicPlaying = false;
 
 function initializeBackgroundMusic() {
-    // Create a synth
-    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-    synth.volume.value = -20; // Lower volume
-    
-    // Create music player
-    backgroundMusic = createMelodyPlayer(synth);
+    // Create audio player for the mp3 file
+    backgroundMusic = new Tone.Player({
+        url: "/static/audio/ahatamatarmusic.mp3",
+        loop: true,
+        volume: -10,
+        autostart: false,
+        onload: function() {
+            console.log("Background music loaded successfully");
+        },
+        onerror: function(e) {
+            console.error("Error loading background music:", e);
+        }
+    }).toDestination();
     
     // Set up music toggle button
     const musicBtn = document.getElementById('music-btn');
@@ -22,6 +29,7 @@ function initializeBackgroundMusic() {
 }
 
 function createMelodyPlayer(synth) {
+    // This is a fallback melody player if the MP3 file doesn't load
     const melody = [
         { note: 'C4', duration: '8n', time: 0 },
         { note: 'E4', duration: '8n', time: '8n' },
@@ -60,13 +68,19 @@ function toggleBackgroundMusic() {
     if (!musicPlaying) {
         // Tone.js requires user interaction to start audio
         Tone.start().then(() => {
-            backgroundMusic.start();
-            musicPlaying = true;
-            if (musicBtn) {
-                musicBtn.classList.add('active');
-                musicBtn.innerHTML = '<i class="fas fa-music"></i>';
-                musicBtn.title = 'Turn Music Off';
+            if (backgroundMusic.loaded) {
+                backgroundMusic.start();
+                musicPlaying = true;
+                if (musicBtn) {
+                    musicBtn.classList.add('active');
+                    musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+                    musicBtn.title = 'Turn Music Off';
+                }
+            } else {
+                console.log("Still loading audio, please try again");
             }
+        }).catch(e => {
+            console.error("Error starting Tone.js:", e);
         });
     } else {
         backgroundMusic.stop();

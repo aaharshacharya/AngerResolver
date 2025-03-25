@@ -46,3 +46,47 @@
     </div>
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click events to idea tags
+        document.querySelectorAll('.idea-tag').forEach(function(tag) {
+            tag.addEventListener('click', function() {
+                const textarea = document.getElementById('message-text');
+                if (textarea) {
+                    if (textarea.value) {
+                        textarea.value += ' ' + this.textContent;
+                    } else {
+                        textarea.value = this.textContent;
+                    }
+                    // Focus the textarea after adding content
+                    textarea.focus();
+                    // Play sound effect
+                    playClickSound();
+                }
+            });
+            
+            // Add hover effect
+            tag.addEventListener('mouseenter', function() {
+                playHoverSound();
+                this.style.transform = 'scale(1.1)';
+            });
+            
+            tag.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Animate the title on page load
+        const title = document.querySelector('.animated-title');
+        title.classList.add('pulse-animation');
+        
+        // Add floating animation to chosen gift text
+        const giftText = document.querySelector('.chosen-gift');
+        if (giftText) {
+            giftText.classList.add('float-animation');
+        }
+    });
+</script>
+{% endblock %}
