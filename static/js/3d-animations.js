@@ -1,8 +1,5 @@
 // 3D Animations for Long Distance Relationship Website
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.132.2/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
-import { gsap } from 'https://cdn.jsdelivr.net/npm/gsap@3.9.1/index.js';
+// Note: We're using globally loaded THREE and gsap from our CDN includes
 
 // Global variables
 let scene, camera, renderer, controls;

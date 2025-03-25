@@ -26,16 +26,31 @@
             <img src="{{ url_for('static', filename='images/gifts/sleep.webp') }}" alt="Happy" class="img-fluid mt-4 mb-4" style="max-height: 200px; border-radius: 10px;">
         </div>
         
-        <a href="{{ url_for('index') }}" class="btn btn-lg btn-primary mt-3 float-animation">
-            <i class="fas fa-home me-2"></i> Start Over
-        </a>
+        <div class="celebration-buttons mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-lg btn-primary mt-3 float-animation">
+                <i class="fas fa-home me-2"></i> Start Over
+            </a>
+            <button type="button" id="celebrate-again" class="btn btn-lg btn-success mt-3 ms-2">
+                <i class="fas fa-party-horn me-2"></i> Celebrate Again!
+            </button>
+        </div>
     </div>
 </div>
+
+<div class="hearts-container" id="celebration-hearts"></div>
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Make elements visible with animation
+        const animateElements = document.querySelectorAll('.animate-on-scroll');
+        animateElements.forEach(function(element, index) {
+            setTimeout(function() {
+                element.classList.add('is-visible');
+            }, 300 * (index + 1));
+        });
+        
         // Add confetti effect for celebration
         setTimeout(function() {
             createConfetti();
@@ -45,6 +60,61 @@
         setTimeout(function() {
             playSuccessSound();
         }, 800);
+        
+        // Celebrate again button
+        const celebrateAgainBtn = document.getElementById('celebrate-again');
+        if (celebrateAgainBtn) {
+            celebrateAgainBtn.addEventListener('click', function() {
+                // Play celebration effects again
+                createConfetti();
+                playSuccessSound();
+                
+                // Add floating hearts
+                const heartsContainer = document.getElementById('celebration-hearts');
+                if (heartsContainer) {
+                    heartsContainer.innerHTML = ''; // Clear previous hearts
+                    
+                    // Create floating hearts
+                    for (let i = 0; i < 20; i++) {
+                        const heart = document.createElement('div');
+                        heart.classList.add('heart');
+                        heart.innerHTML = `
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="rgba(255, 99, 132, 0.7)"/>
+                            </svg>
+                        `;
+                        
+                        // Randomize position and animation
+                        const left = Math.random() * 100;
+                        const size = Math.random() * 20 + 10;
+                        const animDuration = Math.random() * 5 + 3;
+                        
+                        heart.style.left = `${left}%`;
+                        heart.style.top = `100%`;
+                        heart.style.width = `${size}px`;
+                        heart.style.height = `${size}px`;
+                        heart.style.animation = `float-up ${animDuration}s ease-in-out`;
+                        heart.style.opacity = Math.random() * 0.7 + 0.3;
+                        
+                        heartsContainer.appendChild(heart);
+                        
+                        // Remove hearts after animation completes
+                        setTimeout(() => {
+                            heart.remove();
+                        }, animDuration * 1000);
+                    }
+                }
+                
+                // Shake the gift image
+                const giftImage = document.querySelector('.gift-icon-large img');
+                if (giftImage) {
+                    giftImage.style.animation = 'wiggle 0.5s ease-in-out';
+                    setTimeout(() => {
+                        giftImage.style.animation = '';
+                    }, 500);
+                }
+            });
+        }
     });
 </script>
 {% endblock %}

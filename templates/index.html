@@ -3,28 +3,46 @@
 {% block content %}
 <div class="card welcome-card">
     <div class="card-body text-center">
-        <h1 class="animated-title">Hey You! <span class="emoji">😡</span></h1>
+        <h1 class="animated-title">Our Love Journey <span class="emoji">💖</span></h1>
         <div class="subtitle bounce-animation">
-            <p>I know you're upset with me...</p>
+            <p>Distance means so little when someone means so much...</p>
         </div>
         
-        <div class="video-container">
-            <img src="{{ url_for('static', filename='images/gifts/sleep.webp') }}" alt="Sleepy" class="img-fluid rounded" style="max-width: 350px;">
+        <div class="featured-card mb-4">
+            <div class="card special-feature-card">
+                <div class="card-body text-center">
+                    <h3 class="feature-title">Long Distance Love</h3>
+                    <p class="feature-description">Experience a beautiful 3D interactive showcase made especially for you.</p>
+                    <div class="feature-icon-container">
+                        <i class="fas fa-heart-circle-bolt feature-icon pulse-animation"></i>
+                    </div>
+                    <a href="{{ url_for('long_distance') }}" class="btn btn-lg btn-primary float-animation special-btn">
+                        Open Special 3D Experience <i class="fas fa-heart ms-2"></i>
+                    </a>
+                </div>
+            </div>
         </div>
         
-        <div class="message-box">
-            <p>But I've prepared something special just for you!</p>
-            <p>Let me make it up to you with a gift...</p>
+        <div class="message-box mt-4">
+            <p>I've created something magical for us despite the distance between us...</p>
+            <p>A special 3D heart that connects our souls together!</p>
             <p class="hint">(I promise it will make you smile)</p>
         </div>
         
-        <div class="hamster-container mt-4 mb-4">
-            <img src="{{ url_for('static', filename='images/gifts/hamster.jpg') }}" class="hamster img-fluid" alt="Cute Hamster" width="180" height="180" style="border-radius: 50%;">
+        <div class="option-buttons mt-4 mb-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <a href="{{ url_for('long_distance') }}" class="btn btn-lg btn-outline-primary float-animation w-100">
+                        3D Love Experience <i class="fas fa-cube ms-2"></i>
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="{{ url_for('choose') }}" class="btn btn-lg btn-outline-secondary float-animation w-100">
+                        Digital Gifts <i class="fas fa-gift ms-2"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        
-        <a href="{{ url_for('choose') }}" class="btn btn-lg btn-primary float-animation">
-            Let's Make Up <i class="fas fa-heart ms-2"></i>
-        </a>
     </div>
 </div>
 {% endblock %}
@@ -32,16 +50,126 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Add additional animations to the title
+        // Add animations to the title
         const title = document.querySelector('.animated-title');
         title.classList.add('pulse-animation');
         
-        // Add hover effect to hamster image
-        const hamster = document.querySelector('.hamster');
-        hamster.addEventListener('mouseenter', function() {
-            shakeElement(this);
-            playHoverSound();
-        });
+        // Add special animation to the feature card
+        const featureCard = document.querySelector('.special-feature-card');
+        if (featureCard) {
+            featureCard.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    y: -10,
+                    boxShadow: "0 15px 30px rgba(255, 105, 180, 0.3)",
+                    duration: 0.3
+                });
+                playHoverSound();
+            });
+            
+            featureCard.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    y: 0,
+                    boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+                    duration: 0.3
+                });
+            });
+        }
+        
+        // Add particle effects
+        createSpecialEffects();
     });
+    
+    function createSpecialEffects() {
+        // Create sparkle effects around the feature card
+        const container = document.querySelector('.featured-card');
+        if (!container) return;
+        
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                
+                // Random position around the card
+                const top = Math.random() * 100;
+                const left = Math.random() * 100;
+                
+                sparkle.style.top = `${top}%`;
+                sparkle.style.left = `${left}%`;
+                sparkle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                container.appendChild(sparkle);
+            }, i * 300);
+        }
+    }
 </script>
+
+<style>
+    .special-feature-card {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .feature-title {
+        color: #ff3b69;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-description {
+        color: #555;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-icon-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        color: #ff3b69;
+    }
+    
+    .special-btn {
+        background-color: #ff3b69;
+        border-color: #ff3b69;
+    }
+    
+    .special-btn:hover {
+        background-color: #e61a54;
+        border-color: #e61a54;
+        transform: scale(1.05);
+    }
+    
+    .sparkle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: white;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0.8;
+        z-index: 10;
+        animation: sparkleAnimation 5s infinite linear;
+    }
+    
+    @keyframes sparkleAnimation {
+        0% {
+            opacity: 0;
+            transform: scale(0) rotate(0deg);
+        }
+        50% {
+            opacity: 0.8;
+            transform: scale(1) rotate(180deg);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0) rotate(360deg);
+        }
+    }
+</style>
 {% endblock %}
