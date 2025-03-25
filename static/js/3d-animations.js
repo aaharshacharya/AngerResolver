@@ -73,16 +73,15 @@ function animate() {
     // Pulse heart model
     if (heartModel) {
         heartModel.rotation.y += 0.01; //Added rotation for better visuals
-        heartModel.scale.x = 1 + Math.sin(Date.now() * 0.002) * 0.1;
-        heartModel.scale.y = 1 + Math.sin(Date.now() * 0.002) * 0.1;
-        heartModel.scale.z = 1 + Math.sin(Date.now() * 0.002) * 0.1;
+        heartModel.scale.x = 0.2 + Math.sin(Date.now() * 0.002) * 0.02; // Adjusted scaling for better visual effect
+        heartModel.scale.y = 0.2 + Math.sin(Date.now() * 0.002) * 0.02;
+        heartModel.scale.z = 0.2 + Math.sin(Date.now() * 0.002) * 0.02;
     }
 
     // Update particles
     heartParticles.forEach((particle, index) => {
-        particle.rotation.x += 0.01;
-        particle.rotation.y += 0.01;
-        particle.material.opacity -= 0.01;
+        particle.position.y += 0.05; //Added vertical movement for particles
+        particle.material.opacity -= 0.02; //Increased opacity reduction speed
 
         if (particle.material.opacity <= 0) {
             scene.remove(particle);
@@ -178,7 +177,7 @@ function init3DScene() {
     context.font = '32px Arial';
     context.fillStyle = '#ff69b4';
     context.textAlign = 'center';
-    context.fillText('Click to exchange rings!', canvas.width/2, canvas.height/2);
+    context.fillText('Click to exchange rings!', canvas.width / 2, canvas.height / 2);
 
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.MeshBasicMaterial({
@@ -192,25 +191,16 @@ function init3DScene() {
     scene.add(messageBox);
 
 
-    // Handle window resize
-    window.addEventListener('resize', onWindowResize);
+    // Create heart model (from edited code)
+    const heartShape2 = new THREE.Shape();
+    heartShape2.moveTo(0, 0);
+    heartShape2.bezierCurveTo(0, 3, 3, 3, 3, 0);
+    heartShape2.bezierCurveTo(3, -1, 0, -2, 0, -3);
+    heartShape2.bezierCurveTo(0, -2, -3, -1, -3, 0);
+    heartShape2.bezierCurveTo(-3, 3, 0, 3, 0, 0);
 
-    // Start animation loop
-    animate();
-
-    // Create a 3D heart shape -  Modified to use the new heart creation method.
-    const heartShape = new THREE.Shape();
-    const x = 0, y = 0;
-    heartShape.moveTo(x + 0.5, y + 0.5);
-    heartShape.bezierCurveTo(x + 0.5, y + 0.5, x + 0.4, y + 1, x, y + 1);
-    heartShape.bezierCurveTo(x - 0.6, y + 1, x - 0.6, y + 0.4, x - 0.6, y + 0.4);
-    heartShape.bezierCurveTo(x - 0.6, y + 0.2, x - 0.4, y, x, y + 0.2);
-    heartShape.bezierCurveTo(x + 0.4, y, x + 0.6, y + 0.2, x + 0.6, y + 0.4);
-    heartShape.bezierCurveTo(x + 0.6, y + 0.4, x + 0.6, y + 1, x + 0, y + 1);
-    heartShape.bezierCurveTo(x - 0.4, y + 1, x - 0.5, y + 0.5, x - 0.5, y + 0.5);
-
-    const geometryHeart = new THREE.ExtrudeGeometry(heartShape, {
-        depth: 0.2,
+    const geometryHeart = new THREE.ExtrudeGeometry(heartShape2, {
+        depth: 0.5,
         bevelEnabled: true,
         bevelSegments: 3,
         bevelSize: 0.1,
@@ -224,11 +214,15 @@ function init3DScene() {
     });
 
     heartModel = new THREE.Mesh(geometryHeart, materialHeart);
+    heartModel.scale.set(0.2, 0.2, 0.2);
     scene.add(heartModel);
 
 
-    // Create particles
-    createHeartParticles();
+    // Handle window resize
+    window.addEventListener('resize', onWindowResize);
+
+    // Start animation loop
+    animate();
 
     // Add click handler for the ring to trigger special animation
     renderer.domElement.addEventListener('click', onRingClick);
@@ -285,6 +279,7 @@ function createHeartParticles() {
 }
 
 
+
 // Click event handler
 function onRingClick() {
     if (isAnimating) return;
@@ -299,7 +294,7 @@ function onRingClick() {
     context.font = '32px Arial';
     context.fillStyle = '#ff69b4';
     context.textAlign = 'center';
-    context.fillText('With this ring, I thee wed!', canvas.width/2, canvas.height/2);
+    context.fillText('With this ring, I thee wed!', canvas.width / 2, canvas.height / 2);
     messageBox.material.map.needsUpdate = true;
 
     // Animate rings
