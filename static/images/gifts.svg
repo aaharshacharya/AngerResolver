@@ -1,31 +1,87 @@
-<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <!-- Gift box -->
-  <rect x="40" y="80" width="120" height="90" rx="5" fill="#ff6b6b" stroke="#d63031" stroke-width="3"/>
+  <rect x="20" y="40" width="80" height="60" fill="#4ecdc4" rx="5" ry="5" />
   
-  <!-- Box lid -->
-  <rect x="30" y="60" width="140" height="30" rx="5" fill="#ff6b6b" stroke="#d63031" stroke-width="3"/>
+  <!-- Gift box lid -->
+  <rect x="15" y="30" width="90" height="20" fill="#ff6b6b" rx="5" ry="5" />
   
   <!-- Ribbon vertical -->
-  <rect x="90" y="60" width="20" height="110" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  <rect x="55" y="30" width="10" height="70" fill="#ffbe0b" />
   
   <!-- Ribbon horizontal -->
-  <rect x="30" y="85" width="140" height="20" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  <rect x="20" y="50" width="80" height="10" fill="#ffbe0b" />
   
-  <!-- Bow left -->
-  <ellipse cx="75" cy="65" rx="25" ry="15" transform="rotate(-15 75 65)" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  <!-- Ribbon bow left -->
+  <path d="M60 25 Q45 10 45 25 Q45 35 60 25" fill="#ffbe0b">
+    <animate 
+      attributeName="d" 
+      values="M60 25 Q45 10 45 25 Q45 35 60 25;
+              M60 25 Q40 15 45 25 Q45 35 60 25;
+              M60 25 Q45 10 45 25 Q45 35 60 25" 
+      dur="3s" 
+      repeatCount="indefinite" />
+  </path>
   
-  <!-- Bow right -->
-  <ellipse cx="125" cy="65" rx="25" ry="15" transform="rotate(15 125 65)" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  <!-- Ribbon bow right -->
+  <path d="M60 25 Q75 10 75 25 Q75 35 60 25" fill="#ffbe0b">
+    <animate 
+      attributeName="d" 
+      values="M60 25 Q75 10 75 25 Q75 35 60 25;
+              M60 25 Q80 15 75 25 Q75 35 60 25;
+              M60 25 Q75 10 75 25 Q75 35 60 25" 
+      dur="3s" 
+      repeatCount="indefinite" />
+  </path>
   
-  <!-- Bow center -->
-  <circle cx="100" cy="60" r="10" fill="#4ecdc4" stroke="#1e94a0" stroke-width="2"/>
+  <!-- Ribbon bow knot -->
+  <circle cx="60" cy="25" r="5" fill="#ff9f1c" />
   
   <!-- Sparkles -->
-  <g fill="#ffbe0b">
-    <polygon points="30,30 35,35 30,40 25,35" />
-    <polygon points="170,40 175,45 170,50 165,45" />
-    <polygon points="60,20 65,25 60,30 55,25" />
-    <polygon points="140,20 145,25 140,30 135,25" />
-    <polygon points="100,10 105,15 100,20 95,15" />
+  <g>
+    <!-- Sparkle 1 -->
+    <path d="M30 20L32 25L35 20L32 15Z" fill="#ffffff">
+      <animate 
+        attributeName="opacity" 
+        values="0;1;0" 
+        dur="2s" 
+        repeatCount="indefinite" 
+        begin="0s" />
+    </path>
+    
+    <!-- Sparkle 2 -->
+    <path d="M90 25L92 30L95 25L92 20Z" fill="#ffffff">
+      <animate 
+        attributeName="opacity" 
+        values="0;1;0" 
+        dur="2s" 
+        repeatCount="indefinite" 
+        begin="0.5s" />
+    </path>
+    
+    <!-- Sparkle 3 -->
+    <path d="M75 15L77 20L80 15L77 10Z" fill="#ffffff">
+      <animate 
+        attributeName="opacity" 
+        values="0;1;0" 
+        dur="2s" 
+        repeatCount="indefinite" 
+        begin="1s" />
+    </path>
+    
+    <!-- Sparkle 4 -->
+    <path d="M100 40L102 45L105 40L102 35Z" fill="#ffffff">
+      <animate 
+        attributeName="opacity" 
+        values="0;1;0" 
+        dur="2s" 
+        repeatCount="indefinite" 
+        begin="1.5s" />
+    </path>
   </g>
+  
+  <!-- Decoration dots -->
+  <circle cx="30" cy="70" r="3" fill="#ffffff" opacity="0.7" />
+  <circle cx="50" cy="80" r="3" fill="#ffffff" opacity="0.7" />
+  <circle cx="70" cy="70" r="3" fill="#ffffff" opacity="0.7" />
+  <circle cx="90" cy="80" r="3" fill="#ffffff" opacity="0.7" />
 </svg>

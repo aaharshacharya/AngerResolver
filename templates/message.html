@@ -1,49 +1,48 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="card message-card">
+<div class="card">
     <div class="card-body text-center">
-        <h1 class="animated-title">Almost There! <span class="emoji">📝</span></h1>
-        <p class="subtitle">Your gift: <span class="chosen-gift">{{ gift }}</span></p>
-        
-        <div class="message-form">
-            <p>Add a personal touch to your makeup message:</p>
-            
-            <form action="{{ url_for('final') }}" method="post">
-                <div class="form-floating mb-4">
-                    <textarea class="form-control" id="message" name="message" placeholder="Write your message here" rows="4" required></textarea>
-                    <label for="message">Your heartfelt words...</label>
-                </div>
-                
-                <button type="submit" class="btn btn-lg btn-primary float-animation">
-                    Send My Love <i class="fas fa-paper-plane ms-2"></i>
-                </button>
-            </form>
+        <h1 class="animated-title">Add a Personal Message <span class="emoji">✉️</span></h1>
+        <div class="subtitle">
+            <p>You've chosen: <span class="chosen-gift">{{ gift }}</span></p>
         </div>
         
-        <div class="message-ideas mt-4">
-            <p>Need some inspiration?</p>
-            <div class="ideas-container">
-                <span class="idea-tag" onclick="fillMessage('I\'m sorry for being difficult. I love you!')">I'm sorry for being difficult</span>
-                <span class="idea-tag" onclick="fillMessage('You mean the world to me, even when I\'m angry')">You mean the world to me</span>
-                <span class="idea-tag" onclick="fillMessage('Let\'s never go to bed angry at each other')">Let's never go to bed angry</span>
-                <span class="idea-tag" onclick="fillMessage('I appreciate you trying to make me smile')">I appreciate you</span>
+        <div class="message-box mb-4">
+            <p>Now add a special message to go with your gift!</p>
+            <p class="hint">Your words mean everything...</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('final') }}">
+            <div class="form-floating mb-4">
+                <textarea class="form-control" id="message-text" name="message" style="height: 150px" placeholder="Your message..."></textarea>
+                <label for="message-text">Your personal message</label>
             </div>
-        </div>
+            
+            <div class="mb-4">
+                <p class="text-muted mb-2">Need inspiration? Click on these phrases to add them:</p>
+                <div class="ideas-container">
+                    <span class="idea-tag">I'm so sorry</span>
+                    <span class="idea-tag">I miss your smile</span>
+                    <span class="idea-tag">You mean the world to me</span>
+                    <span class="idea-tag">Let's make up</span>
+                    <span class="idea-tag">I was wrong</span>
+                    <span class="idea-tag">I love you</span>
+                    <span class="idea-tag">Forever yours</span>
+                    <span class="idea-tag">You're amazing</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-lg btn-primary">
+                <i class="fas fa-paper-plane me-2"></i> Send My Gift
+            </button>
+        </form>
         
-        <div class="navigation-links mt-4">
+        <div class="mt-3">
             <a href="{{ url_for('choose') }}" class="btn btn-sm btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i> Go Back
+                <i class="fas fa-arrow-left me-1"></i> Choose Different Gift
             </a>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    function fillMessage(message) {
-        document.getElementById('message').value = message;
-    }
-</script>
 {% endblock %}

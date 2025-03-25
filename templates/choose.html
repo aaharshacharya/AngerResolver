@@ -1,87 +1,75 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="card choose-card">
+<div class="card">
     <div class="card-body text-center">
-        <h1 class="animated-title">Pick Your Gift <span class="emoji">🎁</span></h1>
-        <p class="subtitle">What would make you happy today?</p>
+        <h1 class="animated-title">Choose a Gift <span class="emoji">🎁</span></h1>
+        <div class="subtitle">
+            <p>Select the perfect gift to make things right...</p>
+        </div>
         
         <div class="gift-options">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <form action="{{ url_for('message') }}" method="post">
-                        <input type="hidden" name="gift" value="Dinner Date">
-                        <button type="submit" class="gift-option-btn">
-                            <div class="gift-icon">🍽️</div>
-                            <div class="gift-name">Dinner Date</div>
-                        </button>
-                    </form>
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <!-- Gift Option 1 -->
+                <div class="col">
+                    <button class="gift-option-btn" data-gift="A Special Date Night">
+                        <div class="gift-icon">
+                            <img src="{{ url_for('static', filename='images/gifts/gift1.webp') }}" alt="Gift 1" class="img-fluid mb-2" style="max-height: 120px;">
+                        </div>
+                        <div class="gift-name">A Special Date Night</div>
+                        <div class="gift-description text-muted mt-2">Dinner, movie, and full attention - no distractions!</div>
+                    </button>
                 </div>
                 
-                <div class="col-md-4">
-                    <form action="{{ url_for('message') }}" method="post">
-                        <input type="hidden" name="gift" value="Movie Night">
-                        <button type="submit" class="gift-option-btn">
-                            <div class="gift-icon">🎬</div>
-                            <div class="gift-name">Movie Night</div>
-                        </button>
-                    </form>
+                <!-- Gift Option 2 -->
+                <div class="col">
+                    <button class="gift-option-btn" data-gift="Spa Day Package">
+                        <div class="gift-icon">
+                            <img src="{{ url_for('static', filename='images/gifts/gift2.png') }}" alt="Gift 2" class="img-fluid mb-2" style="max-height: 120px;">
+                        </div>
+                        <div class="gift-name">Spa Day Package</div>
+                        <div class="gift-description text-muted mt-2">Relax and be pampered with a full day of treatments</div>
+                    </button>
                 </div>
                 
-                <div class="col-md-4">
-                    <form action="{{ url_for('message') }}" method="post">
-                        <input type="hidden" name="gift" value="Shopping Spree">
-                        <button type="submit" class="gift-option-btn">
-                            <div class="gift-icon">🛍️</div>
-                            <div class="gift-name">Shopping Spree</div>
-                        </button>
-                    </form>
+                <!-- Gift Option 3 -->
+                <div class="col">
+                    <button class="gift-option-btn" data-gift="Breakfast in Bed">
+                        <div class="gift-icon">
+                            <img src="{{ url_for('static', filename='images/gifts.svg') }}" alt="Gift 3" class="img-fluid mb-2" style="max-height: 120px;">
+                        </div>
+                        <div class="gift-name">Breakfast in Bed</div>
+                        <div class="gift-description text-muted mt-2">Wake up to your favorite breakfast, prepared with love</div>
+                    </button>
                 </div>
                 
-                <div class="col-md-4">
-                    <form action="{{ url_for('message') }}" method="post">
-                        <input type="hidden" name="gift" value="Spa Day">
-                        <button type="submit" class="gift-option-btn">
-                            <div class="gift-icon">💆‍♀️</div>
-                            <div class="gift-name">Spa Day</div>
-                        </button>
-                    </form>
-                </div>
-                
-                <div class="col-md-4">
-                    <form action="{{ url_for('message') }}" method="post">
-                        <input type="hidden" name="gift" value="Beach Trip">
-                        <button type="submit" class="gift-option-btn">
-                            <div class="gift-icon">🏖️</div>
-                            <div class="gift-name">Beach Trip</div>
-                        </button>
-                    </form>
-                </div>
-                
-                <div class="col-md-4">
-                    <form action="{{ url_for('message') }}" method="post">
-                        <input type="hidden" name="gift" value="Museum Visit">
-                        <button type="submit" class="gift-option-btn">
-                            <div class="gift-icon">🏛️</div>
-                            <div class="gift-name">Museum Visit</div>
-                        </button>
-                    </form>
+                <!-- Gift Option 4 -->
+                <div class="col">
+                    <button class="gift-option-btn" data-gift="Shopping Spree">
+                        <div class="gift-icon">
+                            <img src="{{ url_for('static', filename='images/gifts/ahatamatar.gif') }}" alt="Gift 4" class="img-fluid mb-2" style="max-height: 120px;">
+                        </div>
+                        <div class="gift-name">Shopping Spree</div>
+                        <div class="gift-description text-muted mt-2">Let's go shopping together, my treat!</div>
+                    </button>
                 </div>
             </div>
         </div>
         
-        <div class="custom-option mt-4">
-            <p>Don't see what you want?</p>
-            <a href="{{ url_for('custom') }}" class="btn btn-outline-primary float-animation">
-                Suggest Your Own Gift <i class="fas fa-gift ms-2"></i>
+        <div class="mt-4">
+            <div class="divider d-flex align-items-center my-4">
+                <p class="text-center mx-3 mb-0">or</p>
+            </div>
+            
+            <a href="{{ url_for('custom') }}" class="btn btn-outline-primary">
+                <i class="fas fa-gift me-2"></i> Create Custom Gift
             </a>
         </div>
         
-        <div class="navigation-links mt-4">
-            <a href="{{ url_for('index') }}" class="btn btn-sm btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i> Go Back
-            </a>
-        </div>
+        <!-- Hidden form to submit the selected gift -->
+        <form id="gift-form" method="POST" action="{{ url_for('message') }}" class="d-none">
+            <input type="hidden" name="gift" value="">
+        </form>
     </div>
 </div>
 {% endblock %}

@@ -1,210 +1,179 @@
-// Animation effects for the gift application
+// Animations for the web application
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeAnimations();
 });
 
-// Initialize all animations
 function initializeAnimations() {
-    // Animate titles with bounce effect
     animateTitles();
-    
-    // Add floating effect to buttons
     addFloatingEffect();
-    
-    // Animate emojis with wiggle
     animateEmojis();
-    
-    // Add page transition effects
     addPageTransitions();
-    
-    // Add scroll-based animations for elements
     addScrollAnimations();
 }
 
-// Bounce animation for titles
+// Animate titles with bounce effect
 function animateTitles() {
-    const titles = document.querySelectorAll('.animated-title');
+    const animatedTitles = document.querySelectorAll('.animated-title');
+    animatedTitles.forEach(title => {
+        title.style.opacity = '0';
+        title.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            title.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+            title.style.opacity = '1';
+            title.style.transform = 'translateY(0)';
+        }, 200);
+        
+        setTimeout(() => {
+            title.classList.add('bounce-animation');
+        }, 1000);
+    });
     
-    titles.forEach(title => {
-        // Split the title text into individual letters
-        const text = title.textContent;
-        let newHtml = '';
+    // Add a slight delay for the subtitle
+    const subtitles = document.querySelectorAll('.subtitle');
+    subtitles.forEach((subtitle, index) => {
+        subtitle.style.opacity = '0';
+        subtitle.style.transform = 'translateY(-15px)';
         
-        for (let i = 0; i < text.length; i++) {
-            if (text[i] === ' ') {
-                newHtml += ' ';
-            } else {
-                // Create a span for each letter with a staggered animation delay
-                newHtml += `<span class="letter" style="animation-delay: ${i * 0.05}s;">${text[i]}</span>`;
+        setTimeout(() => {
+            subtitle.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+            subtitle.style.opacity = '1';
+            subtitle.style.transform = 'translateY(0)';
+        }, 400 + (index * 200));
+    });
+}
+
+// Add floating animation to elements
+function addFloatingEffect() {
+    const floatElements = document.querySelectorAll('.float-animation');
+    floatElements.forEach(element => {
+        // Already has float-animation class which has the CSS animation
+        // Just ensure it starts properly
+        element.style.animationDelay = Math.random() + 's';
+    });
+    
+    // Add floating to gift icons
+    const giftIcons = document.querySelectorAll('.gift-icon');
+    giftIcons.forEach(icon => {
+        icon.classList.add('float-animation');
+        icon.style.animationDuration = (3 + Math.random() * 2) + 's';
+    });
+}
+
+// Animate emojis with wiggle effect
+function animateEmojis() {
+    const emojis = document.querySelectorAll('.emoji');
+    emojis.forEach(emoji => {
+        // Already has the wiggle animation from the emoji class
+        // Just add some randomness
+        emoji.style.animationDelay = Math.random() + 's';
+        emoji.style.animationDuration = (2 + Math.random()) + 's';
+        
+        // Add pulse effect on hover
+        emoji.addEventListener('mouseenter', function() {
+            addPulseEffect(this);
+        });
+    });
+    
+    // Make gift options interactive
+    const giftOptions = document.querySelectorAll('.gift-option-btn');
+    giftOptions.forEach(option => {
+        option.addEventListener('mouseenter', function() {
+            const icon = this.querySelector('.gift-icon');
+            if (icon) {
+                shakeElement(icon);
             }
-        }
-        
-        // Keep the emoji if it exists
-        const emojiSpan = title.querySelector('.emoji');
-        let emojiHtml = '';
-        
-        if (emojiSpan) {
-            emojiHtml = `<span class="emoji">${emojiSpan.textContent}</span>`;
-        }
-        
-        // Replace the title content, keeping any emoji
-        title.innerHTML = newHtml + emojiHtml;
-        
-        // Add the bounce effect to each letter
-        const letters = title.querySelectorAll('.letter');
-        letters.forEach(letter => {
-            letter.style.display = 'inline-block';
-            letter.style.animation = 'bounce 1s infinite ease-in-out';
         });
     });
 }
 
-// Add floating effect to buttons and specific elements
-function addFloatingEffect() {
-    const floatingElements = document.querySelectorAll('.float-animation, .btn-primary, .btn-outline-primary');
-    
-    floatingElements.forEach(element => {
-        // Add a subtle float animation
-        element.style.animation = 'float 3s infinite ease-in-out';
-    });
-}
-
-// Animate emoji elements with wiggle effect
-function animateEmojis() {
-    const emojis = document.querySelectorAll('.emoji');
-    
-    emojis.forEach(emoji => {
-        emoji.style.display = 'inline-block';
-        emoji.style.animation = 'wiggle 2s infinite ease-in-out';
-    });
-}
-
-// Add page transition effects
+// Add subtle page transitions
 function addPageTransitions() {
-    // Fade in the content when page loads
+    // Fade in the content
     const contentWrapper = document.querySelector('.content-wrapper');
     if (contentWrapper) {
         contentWrapper.style.opacity = '0';
-        contentWrapper.style.transition = 'opacity 0.5s ease-in-out';
+        contentWrapper.style.transform = 'translateY(10px)';
         
         setTimeout(() => {
+            contentWrapper.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
             contentWrapper.style.opacity = '1';
+            contentWrapper.style.transform = 'translateY(0)';
         }, 100);
     }
     
-    // Add transition effects to links
-    const links = document.querySelectorAll('a');
-    links.forEach(link => {
-        if (!link.classList.contains('btn')) {
-            link.addEventListener('click', function(e) {
-                // Don't apply to links with '#' which are used for internal page navigation
-                if (this.getAttribute('href') && !this.getAttribute('href').startsWith('#')) {
-                    e.preventDefault();
-                    const href = this.getAttribute('href');
-                    
-                    // Fade out current content
-                    contentWrapper.style.opacity = '0';
-                    
-                    // Navigate after transition completes
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 300);
-                }
-            });
-        }
+    // Animate buttons to appear with delay
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach((button, index) => {
+        button.style.opacity = '0';
+        button.style.transform = 'scale(0.9)';
+        
+        setTimeout(() => {
+            button.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+            button.style.opacity = '1';
+            button.style.transform = 'scale(1)';
+        }, 600 + (index * 150));
     });
 }
 
-// Add animations triggered by scrolling
+// Add scroll-based animations
 function addScrollAnimations() {
-    // Elements to animate on scroll
-    const animatedElements = document.querySelectorAll('.message-box, .gift-options, .custom-form, .message-form, .final-message-container');
+    // Simple implementation for elements that need to animate as they scroll into view
+    const animateOnScroll = document.querySelectorAll('.animate-on-scroll');
     
-    // Check if IntersectionObserver is supported
-    if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in-animation');
-                    observer.unobserve(entry.target);
+    if (animateOnScroll.length > 0) {
+        // Initial check for elements in view
+        checkElementsInView();
+        
+        // Listen for scroll events
+        window.addEventListener('scroll', checkElementsInView);
+        
+        function checkElementsInView() {
+            animateOnScroll.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150; // Number of pixels from the viewport to start the animation
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('is-visible');
                 }
             });
-        }, {
-            root: null,
-            threshold: 0.1
-        });
-        
-        animatedElements.forEach(element => {
-            element.style.opacity = '0';
-            element.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
-            element.style.transform = 'translateY(20px)';
-            observer.observe(element);
-        });
-    } else {
-        // Fallback for browsers that don't support IntersectionObserver
-        animatedElements.forEach(element => {
-            element.classList.add('fade-in-animation');
-        });
+        }
     }
 }
 
-// CSS class for fade-in animation
-document.addEventListener('DOMContentLoaded', function() {
-    const style = document.createElement('style');
-    style.textContent = `
-        .fade-in-animation {
-            animation: fadeIn 0.8s forwards;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    `;
-    document.head.appendChild(style);
-});
-
-// Function to create pulse animation on elements
+// Helper function to add pulse effect to an element
 function addPulseEffect(element) {
-    element.classList.add('pulse-animation');
+    // Don't add if already pulsing
+    if (element.classList.contains('pulsing')) return;
     
-    // Remove the animation class after it completes to allow it to be triggered again
+    element.classList.add('pulsing');
+    
+    // Set pulse animation
+    const originalTransform = element.style.transform || '';
+    element.style.animation = 'pulse 0.5s ease-in-out 2';
+    
+    // Remove class after animation completes
     setTimeout(() => {
-        element.classList.remove('pulse-animation');
+        element.classList.remove('pulsing');
+        element.style.animation = '';
     }, 1000);
 }
 
-// Function to create shake animation for alerts or important elements
+// Helper function to shake an element
 function shakeElement(element) {
-    element.classList.add('shake-animation');
+    // Don't add if already shaking
+    if (element.classList.contains('shaking')) return;
     
-    // Remove the animation class after it completes
+    element.classList.add('shaking');
+    
+    // Set shake animation
+    const originalTransform = element.style.transform || '';
+    element.style.animation = 'wiggle 0.5s ease-in-out';
+    
+    // Remove class after animation completes
     setTimeout(() => {
-        element.classList.remove('shake-animation');
+        element.classList.remove('shaking');
+        element.style.animation = '';
     }, 500);
-    
-    // Add the CSS for shake animation if it doesn't exist
-    if (!document.querySelector('style.shake-style')) {
-        const style = document.createElement('style');
-        style.className = 'shake-style';
-        style.textContent = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-            }
-            
-            .shake-animation {
-                animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-            }
-        `;
-        document.head.appendChild(style);
-    }
 }

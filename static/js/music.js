@@ -16,8 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize the background music
 function initializeBackgroundMusic() {
-    // Create a synth for our background music
-    backgroundMusic = new Tone.Synth({
+    // Create an audio element for the background music
+    backgroundMusic = new Audio('/static/audio/ahatamatarmusic.mp3');
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.5;
+    
+    // We'll also keep the Tone.js synth for effects
+    const synthEffect = new Tone.Synth({
         oscillator: {
             type: "sine"
         },
@@ -28,53 +33,50 @@ function initializeBackgroundMusic() {
             release: 0.8
         }
     }).toDestination();
+    synthEffect.volume.value = -20; // Lower volume
     
-    // Create a PolySynth for chords
+    // Create a PolySynth for effect chords
     const chordSynth = new Tone.PolySynth(Tone.Synth).toDestination();
-    chordSynth.volume.value = -15; // Lower volume
+    chordSynth.volume.value = -25; // Lower volume
     
-    // Create a pattern for happy melody
-    const melody = ["C4", "E4", "G4", "C5", "B4", "G4", "E4", "A4", 
-                    "F4", "A4", "C5", "F5", "E5", "C5", "A4", "G4"];
+    // Create a pattern for happy melody effects
+    const melody = ["C5", "E5", "G5"];
     
-    // Create a loop for the melody
-    const melodyLoop = new Tone.Sequence((time, note) => {
-        backgroundMusic.triggerAttackRelease(note, "8n", time);
-    }, melody, "4n");
-    
-    // Create chords to play occasionally
-    const chords = [
-        ["C4", "E4", "G4"], 
-        ["F4", "A4", "C5"], 
-        ["G4", "B4", "D5"], 
-        ["A4", "C5", "E5"]
-    ];
-    
-    // Create a loop for the chords
-    const chordLoop = new Tone.Sequence((time, chord) => {
-        chordSynth.triggerAttackRelease(chord, "2n", time);
-    }, chords, "2m");
-    
-    // Start the transport and loops when music is toggled on
+    // Set toggle function for our audio
     backgroundMusic.onToggleMusic = function() {
         if (isMusicPlaying) {
-            Tone.Transport.start();
-            melodyLoop.start();
-            chordLoop.start();
+            backgroundMusic.play().catch(e => console.log("Audio play error:", e));
+            
+            // Play a little effect when turning on
+            if (Tone.context.state === 'running') {
+                synthEffect.triggerAttackRelease("C6", "16n");
+                setTimeout(() => {
+                    synthEffect.triggerAttackRelease("E6", "16n");
+                }, 100);
+                setTimeout(() => {
+                    synthEffect.triggerAttackRelease("G6", "16n");
+                }, 200);
+            }
         } else {
-            Tone.Transport.stop();
-            melodyLoop.stop();
-            chordLoop.stop();
+            backgroundMusic.pause();
+            
+            // Play a little effect when turning off
+            if (Tone.context.state === 'running') {
+                synthEffect.triggerAttackRelease("G5", "16n");
+                setTimeout(() => {
+                    synthEffect.triggerAttackRelease("E5", "16n");
+                }, 100);
+                setTimeout(() => {
+                    synthEffect.triggerAttackRelease("C5", "16n");
+                }, 200);
+            }
         }
     };
-    
-    // Set the tempo
-    Tone.Transport.bpm.value = 100;
 }
 
 // Toggle background music on/off
 function toggleBackgroundMusic() {
-    // We need to start audio context with user interaction
+    // We need to start audio context with user interaction for Tone.js effects
     if (Tone.context.state !== 'running') {
         Tone.context.resume();
     }
