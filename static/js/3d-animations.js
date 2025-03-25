@@ -3,14 +3,10 @@
 
 // Global variables
 let scene, camera, renderer, controls;
-let heartModel;
-let heartParticles = [];
-let canvasContainer;
-let floatingHearts = [];
 let ring1, ring2;
-let isAnimating = false;
 let messageBox;
-let clock;
+let isAnimating = false;
+let canvasContainer;
 
 
 function init3DScene() {
@@ -40,77 +36,23 @@ function init3DScene() {
     directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
 
-    createHeartModel();
-    createFloatingHearts();
     createRings();
     createMessageBox();
 
     window.addEventListener('resize', onWindowResize);
     animate();
+
+    // Add click event listener to the canvas
+    renderer.domElement.addEventListener('click', onRingClick);
 }
 
 function onWindowResize() {
+    const canvasContainer = document.getElementById('canvas-container');
     if (!canvasContainer || !camera || !renderer) return;
 
     camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
-}
-
-function createHeartModel() {
-    const heartShape = new THREE.Shape();
-    heartShape.moveTo(0, 0);
-    heartShape.bezierCurveTo(0, 3, 3, 3, 3, 0);
-    heartShape.bezierCurveTo(3, -1, 0, -2, 0, -3);
-    heartShape.bezierCurveTo(0, -2, -3, -1, -3, 0);
-    heartShape.bezierCurveTo(-3, 3, 0, 3, 0, 0);
-
-    const heartGeometry = new THREE.ExtrudeGeometry(heartShape, {
-        depth: 0.5,
-        bevelEnabled: true,
-        bevelSegments: 3,
-        bevelSize: 0.1,
-        bevelThickness: 0.1
-    });
-
-    const heartMaterial = new THREE.MeshPhongMaterial({
-        color: 0xff69b4,
-        shininess: 100,
-        specular: 0x666666
-    });
-
-    heartModel = new THREE.Mesh(heartGeometry, heartMaterial);
-    heartModel.scale.set(0.2, 0.2, 0.2);
-    scene.add(heartModel);
-}
-
-function createFloatingHearts() {
-    for (let i = 0; i < 10; i++) {
-        const heartShape = new THREE.Shape();
-        heartShape.moveTo(0, 0);
-        heartShape.bezierCurveTo(0, 3, 3, 3, 3, 0);
-        heartShape.bezierCurveTo(3, -1, 0, -2, 0, -3);
-        heartShape.bezierCurveTo(0, -2, -3, -1, -3, 0);
-        heartShape.bezierCurveTo(-3, 3, 0, 3, 0, 0);
-
-        const geometry = new THREE.ShapeGeometry(heartShape);
-        const material = new THREE.MeshPhongMaterial({
-            color: 0xff69b4,
-            shininess: 100,
-            transparent: true,
-            opacity: 0.8
-        });
-
-        const heart = new THREE.Mesh(geometry, material);
-        heart.scale.set(0.1, 0.1, 0.1);
-        heart.position.set(
-            (Math.random() - 0.5) * 10,
-            (Math.random() - 0.5) * 10,
-            (Math.random() - 0.5) * 10
-        );
-        scene.add(heart);
-        floatingHearts.push(heart);
-    }
 }
 
 function createRings() {
@@ -124,8 +66,8 @@ function createRings() {
     ring1 = new THREE.Mesh(ringGeometry, goldMaterial);
     ring2 = new THREE.Mesh(ringGeometry.clone(), goldMaterial.clone());
 
-    ring1.position.x = -1.5;
-    ring2.position.x = 1.5;
+    ring1.position.set(-1.5, 0, 0);
+    ring2.position.set(1.5, 0, 0);
 
     scene.add(ring1);
     scene.add(ring2);
@@ -143,7 +85,7 @@ function createMessageBox() {
     context.font = '32px Arial';
     context.fillStyle = '#ff69b4';
     context.textAlign = 'center';
-    context.fillText('Exchange rings with your loved one!', canvas.width / 2, canvas.height / 2);
+    context.fillText('Click to exchange rings!', canvas.width / 2, canvas.height / 2);
 
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.MeshBasicMaterial({
@@ -162,34 +104,66 @@ function animate() {
 
     if (controls) controls.update();
 
-    if (ring1) {
-        ring1.rotation.x += 0.01;
+    if (ring1 && !isAnimating) {
         ring1.rotation.y += 0.01;
     }
 
-    if (ring2) {
-        ring2.rotation.x += 0.01;
+    if (ring2 && !isAnimating) {
         ring2.rotation.y += 0.01;
-    }
-
-    floatingHearts.forEach(heart => {
-        heart.rotation.z += 0.02;
-        heart.position.y += Math.sin(Date.now() * 0.001) * 0.01;
-    });
-
-    if (heartModel) {
-        heartModel.rotation.y += 0.01;
-        const scale = 0.2 + Math.sin(Date.now() * 0.002) * 0.02;
-        heartModel.scale.set(scale, scale, scale);
     }
 
     if (messageBox) {
         messageBox.position.y = 2 + Math.sin(Date.now() * 0.001) * 0.1;
     }
 
-    if (renderer && scene && camera) {
-        renderer.render(scene, camera);
-    }
+    renderer.render(scene, camera);
+}
+
+function onRingClick() {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    const duration = 2;
+    const timeline = gsap.timeline({
+        onComplete: () => {
+            isAnimating = false;
+
+            // Update message
+            const canvas = messageBox.material.map.image;
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.font = '32px Arial';
+            context.fillStyle = '#ff69b4';
+            context.textAlign = 'center';
+            context.fillText('With this ring, I thee wed! 💍', canvas.width / 2, canvas.height / 2);
+            messageBox.material.map.needsUpdate = true;
+        }
+    });
+
+    timeline.to(ring1.position, {
+        x: 0,
+        y: 0,
+        duration: duration,
+        ease: "power2.inOut"
+    })
+    .to(ring2.position, {
+        x: 0,
+        y: 0,
+        duration: duration,
+        ease: "power2.inOut"
+    }, "<")
+    .to(ring1.rotation, {
+        y: Math.PI * 2,
+        duration: duration,
+        ease: "power2.inOut"
+    }, "<")
+    .to(ring2.rotation, {
+        y: Math.PI * 2,
+        duration: duration,
+        ease: "power2.inOut"
+    }, "<");
 }
 
 // Create heart-shaped particles
@@ -233,7 +207,6 @@ function createHeartParticles() {
     }
 }
 
-
 // Emit particles from heart on click
 function emitLoveParticles() {
     const count = 20;
@@ -248,12 +221,12 @@ function emitLoveParticles() {
         );
 
         // Start from heart position
-        particle.position.copy(heartModel.position);
+        //particle.position.copy(heartModel.position); // heartModel is removed
 
         // Add small random offset
-        particle.position.x += (Math.random() - 0.5) * 0.5;
-        particle.position.y += (Math.random() - 0.5) * 0.5;
-        particle.position.z += (Math.random() - 0.5) * 0.5;
+        particle.position.x = (Math.random() - 0.5) * 0.5; //adjusting the origin of the particles
+        particle.position.y = (Math.random() - 0.5) * 0.5;
+        particle.position.z = (Math.random() - 0.5) * 0.5;
 
         scene.add(particle);
         heartParticles.push(particle);
@@ -280,56 +253,7 @@ function emitLoveParticles() {
     }
 }
 
-// Click event handler
-function onRingClick() {
-    if (isAnimating) return;
-    isAnimating = true;
 
-    // Update message
-    const canvas = messageBox.material.map.image;
-    const context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.font = '32px Arial';
-    context.fillStyle = '#ff69b4';
-    context.textAlign = 'center';
-    context.fillText('With this ring, I thee wed!', canvas.width / 2, canvas.height / 2);
-    messageBox.material.map.needsUpdate = true;
-
-    // Animate rings
-    const duration = 2;
-    gsap.to(ring1.position, {
-        x: 1.5,
-        y: 0.5,
-        duration: duration,
-        ease: "power2.inOut"
-    });
-
-    gsap.to(ring2.position, {
-        x: -1.5,
-        y: -0.5,
-        duration: duration,
-        ease: "power2.inOut",
-        onComplete: () => {
-            isAnimating = false;
-            emitLoveParticles();
-        }
-    });
-
-    // Rotate rings
-    gsap.to(ring1.rotation, {
-        z: Math.PI * 2,
-        duration: duration,
-        ease: "power2.inOut"
-    });
-
-    gsap.to(ring2.rotation, {
-        z: -Math.PI * 2,
-        duration: duration,
-        ease: "power2.inOut"
-    });
-}
 
 // Play random love sound on interaction
 function playLoveSound() {
