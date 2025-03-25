@@ -16,10 +16,12 @@ function init3DScene() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xfff0f5);
 
-    camera = new THREE.PerspectiveCamera(75, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
-    camera.position.z = 5;
+    camera = new THREE.PerspectiveCamera(60, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
+    camera.position.set(0, 1, 4);
+    camera.lookAt(0, 0, 0);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.shadowMap.enabled = true;
     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     canvasContainer.appendChild(renderer.domElement);
@@ -55,8 +57,51 @@ function onWindowResize() {
     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
 }
 
+function createHand(isRight) {
+    const handGroup = new THREE.Group();
+    
+    // Create palm
+    const palmGeometry = new THREE.BoxGeometry(0.4, 0.6, 0.2);
+    const skinMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffdbac,
+        roughness: 0.3,
+        metalness: 0.1
+    });
+    const palm = new THREE.Mesh(palmGeometry, skinMaterial);
+    handGroup.add(palm);
+
+    // Create fingers
+    const fingerGeometry = new THREE.CylinderGeometry(0.04, 0.03, 0.4, 8);
+    const fingerPositions = [
+        [-0.15, 0.4, 0],
+        [-0.05, 0.4, 0],
+        [0.05, 0.4, 0],
+        [0.15, 0.4, 0]
+    ];
+
+    fingerPositions.forEach((pos) => {
+        const finger = new THREE.Mesh(fingerGeometry, skinMaterial);
+        finger.position.set(...pos);
+        finger.rotation.x = -Math.PI / 6;
+        handGroup.add(finger);
+    });
+
+    // Create thumb
+    const thumb = new THREE.Mesh(fingerGeometry, skinMaterial);
+    thumb.position.set(0.25, 0.1, 0);
+    thumb.rotation.x = -Math.PI / 4;
+    thumb.rotation.z = -Math.PI / 4;
+    handGroup.add(thumb);
+
+    // Position and rotate based on whether it's right or left hand
+    handGroup.position.x = isRight ? 1 : -1;
+    handGroup.rotation.z = isRight ? -Math.PI / 6 : Math.PI / 6;
+    
+    return handGroup;
+}
+
 function createRings() {
-    const ringGeometry = new THREE.TorusGeometry(0.5, 0.05, 16, 100);
+    const ringGeometry = new THREE.TorusGeometry(0.15, 0.02, 16, 32);
     const goldMaterial = new THREE.MeshStandardMaterial({
         color: 0xffd700,
         metalness: 0.8,
@@ -66,9 +111,15 @@ function createRings() {
     ring1 = new THREE.Mesh(ringGeometry, goldMaterial);
     ring2 = new THREE.Mesh(ringGeometry.clone(), goldMaterial.clone());
 
-    ring1.position.set(-1.5, 0, 0);
-    ring2.position.set(1.5, 0, 0);
+    ring1.position.set(-0.8, 0.2, 0.2);
+    ring2.position.set(0.8, 0.2, 0.2);
 
+    // Create hands
+    const leftHand = createHand(false);
+    const rightHand = createHand(true);
+    
+    scene.add(leftHand);
+    scene.add(rightHand);
     scene.add(ring1);
     scene.add(ring2);
 }
