@@ -116,16 +116,16 @@
             </div>
         </div>
         
-        <!-- Special Messages -->
+        <!-- Video Message -->
         <div class="card mt-4">
             <div class="card-body text-center">
-                <h3>Daily Affirmation</h3>
-                <p id="daily-message" class="love-quote">
-                    "Distance means so little when someone means so much. I love you more than words can express."
-                </p>
-                <button class="btn btn-sm btn-primary" id="new-affirmation">
-                    <i class="fas fa-sync me-1"></i> New Message
-                </button>
+                <h3>Our Special Moments</h3>
+                <div class="video-container mt-3">
+                    <video id="proposal-video" class="w-100" style="max-width: 600px; border-radius: 10px;" autoplay muted loop playsinline>
+                        <source src="{{ url_for('static', filename='video/Proposal Flipbook.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
             </div>
         </div>
     </div>
