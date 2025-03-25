@@ -54,7 +54,7 @@ function createRing() {
 function animate() {
     requestAnimationFrame(animate);
 
-    if (controls) controls.update(); //Fixed: Check if controls exists before updating
+    if (controls) controls.update();
 
     // Rotate ring
     if (ring) {
@@ -70,10 +70,23 @@ function animate() {
 
     // Pulse heart model
     if (heartModel) {
+        heartModel.rotation.y += 0.01; //Added rotation for better visuals
         heartModel.scale.x = 1 + Math.sin(Date.now() * 0.002) * 0.1;
         heartModel.scale.y = 1 + Math.sin(Date.now() * 0.002) * 0.1;
         heartModel.scale.z = 1 + Math.sin(Date.now() * 0.002) * 0.1;
     }
+
+    // Update particles
+    heartParticles.forEach((particle, index) => {
+        particle.rotation.x += 0.01;
+        particle.rotation.y += 0.01;
+        particle.material.opacity -= 0.01;
+
+        if (particle.material.opacity <= 0) {
+            scene.remove(particle);
+            heartParticles.splice(index, 1);
+        }
+    });
 
     if (renderer && scene && camera) {
         renderer.render(scene, camera);
@@ -134,16 +147,41 @@ function init3DScene() {
     // Start animation loop
     animate();
 
-    // Create a 3D heart shape
-    createHeart();
+
+    // Create a 3D heart shape -  Modified to use the new heart creation method.
+    const heartShape = new THREE.Shape();
+    const x = 0, y = 0;
+    heartShape.moveTo(x + 0.5, y + 0.5);
+    heartShape.bezierCurveTo(x + 0.5, y + 0.5, x + 0.4, y + 1, x, y + 1);
+    heartShape.bezierCurveTo(x - 0.6, y + 1, x - 0.6, y + 0.4, x - 0.6, y + 0.4);
+    heartShape.bezierCurveTo(x - 0.6, y + 0.2, x - 0.4, y, x, y + 0.2);
+    heartShape.bezierCurveTo(x + 0.4, y, x + 0.6, y + 0.2, x + 0.6, y + 0.4);
+    heartShape.bezierCurveTo(x + 0.6, y + 0.4, x + 0.6, y + 1, x + 0, y + 1);
+    heartShape.bezierCurveTo(x - 0.4, y + 1, x - 0.5, y + 0.5, x - 0.5, y + 0.5);
+
+    const geometry = new THREE.ExtrudeGeometry(heartShape, {
+        depth: 0.2,
+        bevelEnabled: true,
+        bevelSegments: 3,
+        bevelSize: 0.1,
+        bevelThickness: 0.1
+    });
+
+    const material = new THREE.MeshPhongMaterial({
+        color: 0xff69b4,
+        shininess: 100,
+        specular: 0x666666
+    });
+
+    heartModel = new THREE.Mesh(geometry, material);
+    scene.add(heartModel);
+
 
     // Create particles
     createHeartParticles();
 
     // Add click handler for the heart to trigger special animation
-    renderer.domElement.addEventListener('click', () => {
-        pulseHeartAnimation();
-    });
+    renderer.domElement.addEventListener('click', onHeartClick);
 }
 
 // Handle window resizing
@@ -153,50 +191,6 @@ function onWindowResize() {
     camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
-}
-
-// Create a 3D heart
-function createHeart() {
-    // Create heart geometry (simplified shape)
-    const heartShape = new THREE.Shape();
-
-    // Draw heart using bezier curves
-    heartShape.moveTo(0, 2);
-    heartShape.bezierCurveTo(0, 3, 3, 3, 3, 0);
-    heartShape.bezierCurveTo(3, -1, 1, -3, 0, -3);
-    heartShape.bezierCurveTo(-1, -3, -3, -1, -3, 0);
-    heartShape.bezierCurveTo(-3, 3, 0, 3, 0, 2);
-
-    const extrudeSettings = {
-        depth: 1,
-        bevelEnabled: true,
-        bevelSegments: 2,
-        steps: 2,
-        bevelSize: 0.5,
-        bevelThickness: 0.5
-    };
-
-    const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
-    const material = new THREE.MeshStandardMaterial({
-        color: 0xff3b69,
-        metalness: 0.3,
-        roughness: 0.4,
-        emissive: 0xff0066,
-        emissiveIntensity: 0.2
-    });
-
-    heartModel = new THREE.Mesh(geometry, material);
-
-    // Scale and position the heart
-    heartModel.scale.set(0.6, 0.6, 0.6);
-    heartModel.rotation.set(-Math.PI / 2, 0, 0);
-    heartModel.position.set(0, 0, 0);
-    heartModel.castShadow = true;
-
-    scene.add(heartModel);
-
-    // Add mild floating animation
-    animateFloatingHeart();
 }
 
 // Create heart-shaped particles
@@ -240,86 +234,29 @@ function createHeartParticles() {
     }
 }
 
-// Handle window resizing
-function onWindowResize() {
-    if (!canvasContainer) return;
 
-    camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
-}
-
-// Update particle animations
-function updateParticles() {
-    heartParticles.forEach(particle => {
-        // Rotate particle around its own axis
-        particle.rotation.x += particle.userData.rotationSpeed;
-        particle.rotation.y += particle.userData.rotationSpeed * 0.7;
-
-        // Rotate around heart
-        const rotationMatrix = new THREE.Matrix4().makeRotationAxis(
-            particle.userData.rotationAxis,
-            particle.userData.speed
-        );
-        particle.position.applyMatrix4(rotationMatrix);
-
-        // Pulse size
-        const scale = 1 + 0.2 * Math.sin(Date.now() * particle.userData.pulseSpeed);
-        particle.scale.set(scale, scale, scale);
-
-        // Adjust opacity for twinkling effect
-        particle.material.opacity = 0.3 + 0.5 * Math.sin(Date.now() * 0.001 + particle.position.x);
-    });
-}
-
-// Floating heart animation with GSAP
-function animateFloatingHeart() {
-    gsap.to(heartModel.position, {
-        y: 0.2,
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut"
-    });
-
-    gsap.to(heartModel.rotation, {
-        z: 0.1,
-        duration: 2.5,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut"
-    });
-}
-
-// Heart pulse animation triggered on click
-function pulseHeartAnimation() {
-    // Store original scale
+// Click event handler
+function onHeartClick() {
+    //Added pulse animation here to reflect the changes in the edited code
     const originalScale = { x: heartModel.scale.x, y: heartModel.scale.y, z: heartModel.scale.z };
-
-    // Create pulse timeline
-    const timeline = gsap.timeline();
-
-    // Pulse animation
-    timeline.to(heartModel.scale, {
+    gsap.to(heartModel.scale, {
         x: originalScale.x * 1.3,
         y: originalScale.y * 1.3,
         z: originalScale.z * 1.3,
         duration: 0.3,
-        ease: "power2.out"
+        ease: "power2.out",
+        onComplete: () => {
+            gsap.to(heartModel.scale, {
+                x: originalScale.x,
+                y: originalScale.y,
+                z: originalScale.z,
+                duration: 0.5,
+                ease: "elastic.out(1, 0.3)"
+            });
+        }
     });
 
-    timeline.to(heartModel.scale, {
-        x: originalScale.x,
-        y: originalScale.y,
-        z: originalScale.z,
-        duration: 0.5,
-        ease: "elastic.out(1, 0.3)"
-    });
-
-    // Emit additional particles
     emitLoveParticles();
-
-    // Play random love message
     playLoveSound();
 }
 
@@ -347,7 +284,7 @@ function emitLoveParticles() {
         particle.position.z += (Math.random() - 0.5) * 0.5;
 
         scene.add(particle);
-        particles.push(particle);
+        heartParticles.push(particle);
 
         // Animate particle outward with GSAP
         gsap.to(particle.position, {
@@ -716,4 +653,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Make functions available globally
 window.init3DScene = init3DScene;
-window.pulseHeartAnimation = pulseHeartAnimation;
+window.pulseHeartAnimation = onHeartClick; //Update to use the new click handler
