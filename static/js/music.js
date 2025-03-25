@@ -9,7 +9,7 @@ function initializeBackgroundMusic() {
         url: "/static/audio/background-song.mp3",
         loop: true,
         volume: -10,
-        autostart: false,
+        autostart: true,
         onload: function() {
             console.log("Background music loaded successfully");
         },
@@ -20,6 +20,20 @@ function initializeBackgroundMusic() {
     
     // Set up music toggle button
     const musicBtn = document.getElementById('music-btn');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        Tone.start().then(() => {
+            if (backgroundMusic.loaded) {
+                backgroundMusic.start();
+                musicPlaying = true;
+                if (musicBtn) {
+                    musicBtn.classList.add('active');
+                    musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+                    musicBtn.title = 'Turn Music Off';
+                }
+            }
+        });
+    });
     
     if (musicBtn) {
         musicBtn.addEventListener('click', function() {
