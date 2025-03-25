@@ -68,7 +68,7 @@
                     </div>
                     <h3>Virtual Date</h3>
                     <p>Plan a special online date with synchronized activities</p>
-                    <button class="feature-button" id="plan-date">Plan Now</button>
+                    <a href="https://www.instagram.com/ashypsl/" target="_blank" class="feature-button">Plan Now</a>
                 </div>
             </div>
             
@@ -80,7 +80,7 @@
                     </div>
                     <h3>Shared Playlist</h3>
                     <p>Create a playlist of your special songs together</p>
-                    <button class="feature-button" id="create-playlist">Create</button>
+                    <a href="https://open.spotify.com/playlist/create" target="_blank" class="feature-button">Create</a>
                 </div>
             </div>
             
@@ -100,7 +100,20 @@
             <h2 class="section-title">Things To Do Together</h2>
             <p class="section-subtitle">Distance doesn't mean we can't share experiences</p>
             
-            <div id="activities-container"></div>
+            <div class="activities-grid">
+                <div class="activity-item" onclick="window.open('https://www.netflix.com/browse', '_blank')">
+                    <i class="fas fa-film"></i>
+                    <h4>Watch Movies</h4>
+                </div>
+                <div class="activity-item" onclick="window.open('https://skribbl.io/', '_blank')">
+                    <i class="fas fa-gamepad"></i>
+                    <h4>Play Games</h4>
+                </div>
+                <div class="activity-item" onclick="window.open('https://www.allrecipes.com/', '_blank')">
+                    <i class="fas fa-utensils"></i>
+                    <h4>Cook Together</h4>
+                </div>
+            </div>
         </div>
         
         <!-- Special Messages -->
@@ -120,7 +133,18 @@
 {% endblock %}
 
 {% block scripts %}
+<audio id="background-music" loop>
+    <source src="{{ url_for('static', filename='audio/paaro.mp3') }}" type="audio/mp3">
+</audio>
 <script type="module" src="{{ url_for('static', filename='js/3d-animations.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const music = document.getElementById('background-music');
+        document.body.addEventListener('click', function() {
+            music.play().catch(err => console.log('Audio play error:', err));
+        });
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Set up emoji picker

@@ -55,6 +55,39 @@
 
 .countdown-title {
     color: #ff69b4;
+
+.activities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.activity-item {
+    background: rgba(255, 105, 180, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s, background 0.3s;
+}
+
+.activity-item:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 105, 180, 0.2);
+}
+
+.activity-item i {
+    font-size: 2rem;
+    color: #ff69b4;
+    margin-bottom: 10px;
+}
+
+.activity-item h4 {
+    color: #333;
+    margin: 0;
+}
+
     margin-bottom: 1rem;
     font-weight: bold;
 }
