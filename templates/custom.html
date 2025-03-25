@@ -1,48 +1,45 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="card custom-card">
+<div class="card">
     <div class="card-body text-center">
-        <h1 class="animated-title">Your Perfect Gift <span class="emoji">✨</span></h1>
-        <p class="subtitle">Tell me what would make you happy...</p>
-        
-        <div class="custom-form">
-            <form action="{{ url_for('custom') }}" method="post">
-                <div class="form-floating mb-4">
-                    <input type="text" class="form-control" id="custom_gift" name="custom_gift" placeholder="Your dream gift" required>
-                    <label for="custom_gift">What would you like?</label>
-                </div>
-                
-                <button type="submit" class="btn btn-lg btn-primary float-animation">
-                    That's My Choice <i class="fas fa-check-circle ms-2"></i>
-                </button>
-            </form>
+        <h1 class="animated-title">Create a Custom Gift <span class="emoji">💝</span></h1>
+        <div class="subtitle">
+            <p>Something more personal? Describe your gift idea below</p>
         </div>
         
-        <div class="gift-ideas mt-4">
-            <p>Need some ideas?</p>
-            <div class="ideas-container">
-                <span class="idea-tag" onclick="fillIdea('Ice Cream Date')">Ice Cream Date</span>
-                <span class="idea-tag" onclick="fillIdea('Coffee & Cuddles')">Coffee & Cuddles</span>
-                <span class="idea-tag" onclick="fillIdea('Picnic in the Park')">Picnic in the Park</span>
-                <span class="idea-tag" onclick="fillIdea('Stargazing Night')">Stargazing Night</span>
-                <span class="idea-tag" onclick="fillIdea('Cooking Together')">Cooking Together</span>
+        <div class="message-box mb-4">
+            <p>What special gift would make everything better?</p>
+            <p class="hint">Be creative! It can be anything you want to give...</p>
+        </div>
+        
+        <form id="custom-gift-form" method="POST" action="{{ url_for('custom') }}">
+            <div class="form-floating mb-4">
+                <input type="text" class="form-control" id="custom-gift-input" name="custom_gift" placeholder="Describe your gift">
+                <label for="custom-gift-input">Your custom gift idea</label>
             </div>
-        </div>
+            
+            <div class="gift-examples mb-4">
+                <p class="text-muted mb-2">Need inspiration? Try one of these:</p>
+                <div class="ideas-container">
+                    <span class="idea-tag" onclick="document.getElementById('custom-gift-input').value='A weekend getaway'">A weekend getaway</span>
+                    <span class="idea-tag" onclick="document.getElementById('custom-gift-input').value='A romantic home-cooked dinner'">A romantic home-cooked dinner</span>
+                    <span class="idea-tag" onclick="document.getElementById('custom-gift-input').value='Concert tickets'">Concert tickets</span>
+                    <span class="idea-tag" onclick="document.getElementById('custom-gift-input').value='A handwritten love letter'">A handwritten love letter</span>
+                    <span class="idea-tag" onclick="document.getElementById('custom-gift-input').value='Dance lessons together'">Dance lessons together</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-lg btn-primary">
+                <i class="fas fa-gift me-2"></i> Create This Gift
+            </button>
+        </form>
         
-        <div class="navigation-links mt-4">
+        <div class="mt-3">
             <a href="{{ url_for('choose') }}" class="btn btn-sm btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i> Go Back
+                <i class="fas fa-arrow-left me-1"></i> Back to Gift Selection
             </a>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    function fillIdea(idea) {
-        document.getElementById('custom_gift').value = idea;
-    }
-</script>
 {% endblock %}

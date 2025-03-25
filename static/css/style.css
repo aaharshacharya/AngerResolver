@@ -335,6 +335,81 @@ textarea.form-control {
     50% { transform: scale(1.05); }
 }
 
+@keyframes float-up {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-1000px); }
+}
+
+@keyframes fall {
+    0% { 
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateY(1000px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ===== CONFETTI STYLES ===== */
+.confetti {
+    position: absolute;
+    z-index: 100;
+    border-radius: 2px;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+/* ===== HAMSTER ANIMATION ===== */
+.hamster-container {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.hamster {
+    border: 5px solid var(--primary-color);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    animation: hamster-dance 3s infinite;
+}
+
+@keyframes hamster-dance {
+    0% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(10deg); }
+    50% { transform: scale(0.9) rotate(-10deg); }
+    75% { transform: scale(1.1) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.hamster-container:hover .hamster {
+    animation: hamster-spin 1s infinite;
+}
+
+@keyframes hamster-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== SCROLL ANIMATION ===== */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== MUSIC BUTTON STYLES ===== */
+.music-btn.active {
+    background-image: linear-gradient(135deg, var(--primary-color) 0%, #ff9f9f 100%);
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+    transform: scale(1.1);
+}
+
 /* ===== RESPONSIVE ADJUSTMENTS ===== */
 @media (max-width: 768px) {
     .card-body {

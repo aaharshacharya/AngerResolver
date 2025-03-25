@@ -1,111 +1,80 @@
-// Background music player functionality
+// Background music controller using Tone.js
 
 let backgroundMusic;
-let isMusicPlaying = false;
-const musicIcon = document.getElementById('music-icon');
-const musicToggle = document.getElementById('music-toggle');
+let musicPlaying = false;
 
-document.addEventListener('DOMContentLoaded', function() {
-    initializeBackgroundMusic();
-    
-    // Add event listener to music toggle button
-    if (musicToggle) {
-        musicToggle.addEventListener('click', toggleBackgroundMusic);
-    }
-});
-
-// Initialize the background music
 function initializeBackgroundMusic() {
-    // Create an audio element for the background music
-    backgroundMusic = new Audio('/static/audio/ahatamatarmusic.mp3');
-    backgroundMusic.loop = true;
-    backgroundMusic.volume = 0.5;
+    // Create a synth
+    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+    synth.volume.value = -20; // Lower volume
     
-    // We'll also keep the Tone.js synth for effects
-    const synthEffect = new Tone.Synth({
-        oscillator: {
-            type: "sine"
+    // Create music player
+    backgroundMusic = createMelodyPlayer(synth);
+    
+    // Set up music toggle button
+    const musicBtn = document.getElementById('music-btn');
+    
+    if (musicBtn) {
+        musicBtn.addEventListener('click', function() {
+            toggleBackgroundMusic();
+        });
+    }
+}
+
+function createMelodyPlayer(synth) {
+    const melody = [
+        { note: 'C4', duration: '8n', time: 0 },
+        { note: 'E4', duration: '8n', time: '8n' },
+        { note: 'G4', duration: '8n', time: '4n' },
+        { note: 'B4', duration: '8n', time: '4n + 8n' },
+        { note: 'A4', duration: '8n', time: '2n' },
+        { note: 'G4', duration: '8n', time: '2n + 8n' },
+        { note: 'E4', duration: '2n', time: '2n + 4n' },
+        { note: 'C4', duration: '8n', time: '1n' },
+        { note: 'D4', duration: '8n', time: '1n + 8n' },
+        { note: 'E4', duration: '8n', time: '1n + 4n' },
+        { note: 'G4', duration: '8n', time: '1n + 4n + 8n' },
+        { note: 'F4', duration: '2n', time: '1n + 2n' },
+    ];
+    
+    const part = new Tone.Part((time, note) => {
+        synth.triggerAttackRelease(note.note, note.duration, time);
+    }, melody).start(0);
+    
+    part.loop = true;
+    part.loopEnd = '2n + 2n';
+    
+    return {
+        start: function() {
+            Tone.Transport.start();
         },
-        envelope: {
-            attack: 0.1,
-            decay: 0.2,
-            sustain: 0.5,
-            release: 0.8
-        }
-    }).toDestination();
-    synthEffect.volume.value = -20; // Lower volume
-    
-    // Create a PolySynth for effect chords
-    const chordSynth = new Tone.PolySynth(Tone.Synth).toDestination();
-    chordSynth.volume.value = -25; // Lower volume
-    
-    // Create a pattern for happy melody effects
-    const melody = ["C5", "E5", "G5"];
-    
-    // Set toggle function for our audio
-    backgroundMusic.onToggleMusic = function() {
-        if (isMusicPlaying) {
-            backgroundMusic.play().catch(e => console.log("Audio play error:", e));
-            
-            // Play a little effect when turning on
-            if (Tone.context.state === 'running') {
-                synthEffect.triggerAttackRelease("C6", "16n");
-                setTimeout(() => {
-                    synthEffect.triggerAttackRelease("E6", "16n");
-                }, 100);
-                setTimeout(() => {
-                    synthEffect.triggerAttackRelease("G6", "16n");
-                }, 200);
-            }
-        } else {
-            backgroundMusic.pause();
-            
-            // Play a little effect when turning off
-            if (Tone.context.state === 'running') {
-                synthEffect.triggerAttackRelease("G5", "16n");
-                setTimeout(() => {
-                    synthEffect.triggerAttackRelease("E5", "16n");
-                }, 100);
-                setTimeout(() => {
-                    synthEffect.triggerAttackRelease("C5", "16n");
-                }, 200);
-            }
+        stop: function() {
+            Tone.Transport.stop();
         }
     };
 }
 
-// Toggle background music on/off
 function toggleBackgroundMusic() {
-    // We need to start audio context with user interaction for Tone.js effects
-    if (Tone.context.state !== 'running') {
-        Tone.context.resume();
-    }
+    const musicBtn = document.getElementById('music-btn');
     
-    isMusicPlaying = !isMusicPlaying;
-    
-    // Update the icon
-    if (musicIcon) {
-        if (isMusicPlaying) {
-            musicIcon.className = 'fas fa-volume-up';
-            musicToggle.classList.add('active');
-        } else {
-            musicIcon.className = 'fas fa-volume-mute';
-            musicToggle.classList.remove('active');
+    if (!musicPlaying) {
+        // Tone.js requires user interaction to start audio
+        Tone.start().then(() => {
+            backgroundMusic.start();
+            musicPlaying = true;
+            if (musicBtn) {
+                musicBtn.classList.add('active');
+                musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+                musicBtn.title = 'Turn Music Off';
+            }
+        });
+    } else {
+        backgroundMusic.stop();
+        musicPlaying = false;
+        if (musicBtn) {
+            musicBtn.classList.remove('active');
+            musicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            musicBtn.title = 'Turn Music On';
         }
     }
-    
-    // Toggle the music
-    if (backgroundMusic && backgroundMusic.onToggleMusic) {
-        backgroundMusic.onToggleMusic();
-    }
 }
-
-// Attempt to autoplay music (will likely be blocked by browsers)
-document.addEventListener('click', function startMusicOnInteraction() {
-    // Only try to autoplay once
-    document.removeEventListener('click', startMusicOnInteraction);
-    
-    if (!isMusicPlaying) {
-        toggleBackgroundMusic();
-    }
-}, { once: true });

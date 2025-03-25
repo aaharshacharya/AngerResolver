@@ -1,58 +1,50 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="card final-card">
+<div class="card">
     <div class="card-body text-center">
-        <h1 class="animated-title celebration-title">We Made Up! <span class="emoji">🎉</span></h1>
-        
-        <div class="celebration-animation">
-            <!-- Dynamic confetti animation will appear here -->
+        <h1 class="celebration-title animated-title">Yay! <span class="emoji">🎉</span></h1>
+        <div class="subtitle bounce-animation">
+            <p>Your gift has been sent with love!</p>
         </div>
         
-        <div class="final-message-container">
-            <div class="gift-confirmation">
-                <h3>Your Gift:</h3>
-                <div class="confirmed-gift">{{ gift }}</div>
-                <div class="gift-icon-large">
-                    {% if gift == "Dinner Date" %}🍽️
-                    {% elif gift == "Movie Night" %}🎬
-                    {% elif gift == "Shopping Spree" %}🛍️
-                    {% elif gift == "Spa Day" %}💆‍♀️
-                    {% elif gift == "Beach Trip" %}🏖️
-                    {% elif gift == "Museum Visit" %}🏛️
-                    {% else %}🎁
-                    {% endif %}
-                </div>
+        <div class="gift-confirmation animate-on-scroll">
+            <div class="gift-icon-large">
+                <img src="{{ url_for('static', filename='images/gifts/ahatamatar.gif') }}" alt="Gift animation" style="max-height: 150px;">
             </div>
-            
-            <div class="personal-message">
-                <h3>Your Message:</h3>
-                <div class="message-content">
-                    "{{ message }}"
-                </div>
-            </div>
-            
-            <div class="final-note mt-4">
-                <p>Our makeup is official! I promise to make this happen.</p>
-                <p class="love-signature">With all my love ❤️</p>
-            </div>
+            <p>You're giving:</p>
+            <div class="confirmed-gift">{{ gift }}</div>
         </div>
         
-        <div class="restart-option mt-4">
-            <a href="{{ url_for('index') }}" class="btn btn-lg btn-outline-primary float-animation">
-                Start Over <i class="fas fa-redo-alt ms-2"></i>
-            </a>
+        <div class="personal-message animate-on-scroll">
+            <p>With this special message:</p>
+            <div class="message-content">"{{ message }}"</div>
+            <div class="love-signature">With Love ❤️</div>
         </div>
+        
+        <div class="success-animation">
+            <img src="{{ url_for('static', filename='images/gifts/sleep.webp') }}" alt="Happy" class="img-fluid mt-4 mb-4" style="max-height: 200px; border-radius: 10px;">
+        </div>
+        
+        <a href="{{ url_for('index') }}" class="btn btn-lg btn-primary mt-3 float-animation">
+            <i class="fas fa-home me-2"></i> Start Over
+        </a>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // Trigger celebration effects when page loads
     document.addEventListener('DOMContentLoaded', function() {
-        createConfetti();
-        playSuccessSound();
+        // Add confetti effect for celebration
+        setTimeout(function() {
+            createConfetti();
+        }, 500);
+        
+        // Play success sound
+        setTimeout(function() {
+            playSuccessSound();
+        }, 800);
     });
 </script>
 {% endblock %}
