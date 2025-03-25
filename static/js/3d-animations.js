@@ -55,38 +55,6 @@ function onWindowResize() {
     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
 }
 
-function createHeartShape() {
-    const heartShape = new THREE.Shape();
-    
-    heartShape.moveTo(0, 0);
-    heartShape.bezierCurveTo(0, 0.8, 1.4, 0.8, 1.4, 0);
-    heartShape.bezierCurveTo(1.4, -1.2, 0, -1.6, 0, -0.8);
-    heartShape.bezierCurveTo(0, -1.6, -1.4, -1.2, -1.4, 0);
-    heartShape.bezierCurveTo(-1.4, 0.8, 0, 0.8, 0, 0);
-
-    const geometry = new THREE.ExtrudeGeometry(heartShape, {
-        depth: 0.3,
-        bevelEnabled: true,
-        bevelSegments: 3,
-        bevelSize: 0.1,
-        bevelThickness: 0.1
-    });
-
-    const material = new THREE.MeshStandardMaterial({
-        color: 0xff69b4,
-        metalness: 0.4,
-        roughness: 0.5,
-    });
-
-    const heart = new THREE.Mesh(geometry, material);
-    heart.scale.set(0.4, 0.4, 0.4);
-    heart.rotation.x = Math.PI;
-    heart.position.y = 0.5;
-    
-    scene.add(heart);
-    return heart;
-}
-
 function createRings() {
     const ringGeometry = new THREE.TorusGeometry(0.5, 0.05, 16, 100);
     const goldMaterial = new THREE.MeshStandardMaterial({
@@ -103,10 +71,6 @@ function createRings() {
 
     scene.add(ring1);
     scene.add(ring2);
-    
-    // Create and add heart
-    const heart = createHeartShape();
-    heart.position.y = 1.5;
 }
 
 function createMessageBox() {
