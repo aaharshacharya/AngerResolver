@@ -3,13 +3,15 @@
 
 // Global variables
 let scene, camera, renderer, controls;
-let ring1, ring2, ringBox;
-let isAnimating = false;
-let messageBox;
-let heartModel, clock, mixer;
+let heartModel;
 let heartParticles = [];
 let canvasContainer;
 let floatingHearts = [];
+let ring1, ring2, ringBox;
+let isAnimating = false;
+let messageBox;
+let clock, mixer;
+
 
 // Create floating heart geometries
 function createFloatingHeart() {
@@ -72,16 +74,16 @@ function animate() {
 
     // Pulse heart model
     if (heartModel) {
-        heartModel.rotation.y += 0.01; //Added rotation for better visuals
-        heartModel.scale.x = 0.2 + Math.sin(Date.now() * 0.002) * 0.02; // Adjusted scaling for better visual effect
+        heartModel.rotation.y += 0.01; 
+        heartModel.scale.x = 0.2 + Math.sin(Date.now() * 0.002) * 0.02; 
         heartModel.scale.y = 0.2 + Math.sin(Date.now() * 0.002) * 0.02;
         heartModel.scale.z = 0.2 + Math.sin(Date.now() * 0.002) * 0.02;
     }
 
     // Update particles
     heartParticles.forEach((particle, index) => {
-        particle.position.y += 0.05; //Added vertical movement for particles
-        particle.material.opacity -= 0.02; //Increased opacity reduction speed
+        particle.position.y += 0.05; 
+        particle.material.opacity -= 0.02; 
 
         if (particle.material.opacity <= 0) {
             scene.remove(particle);
@@ -114,30 +116,44 @@ function init3DScene() {
     camera.position.z = 5;
 
     // Create renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.shadowMap.enabled = true;
-
-    // Clear existing content and append renderer
-    canvasContainer.innerHTML = '';
     canvasContainer.appendChild(renderer.domElement);
 
-    // Add orbit controls
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.rotateSpeed = 0.5;
-
-    // Add ambient light
+    // Add lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
-    // Add directional light
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(5, 5, 5);
-    directionalLight.castShadow = true;
     scene.add(directionalLight);
+
+    // Create heart model
+    const heartShape = new THREE.Shape();
+    heartShape.moveTo(0, 0);
+    heartShape.bezierCurveTo(0, 3, 3, 3, 3, 0);
+    heartShape.bezierCurveTo(3, -1, 0, -2, 0, -3);
+    heartShape.bezierCurveTo(0, -2, -3, -1, -3, 0);
+    heartShape.bezierCurveTo(-3, 3, 0, 3, 0, 0);
+
+    const heartGeometry = new THREE.ExtrudeGeometry(heartShape, {
+        depth: 0.5,
+        bevelEnabled: true,
+        bevelSegments: 3,
+        bevelSize: 0.1,
+        bevelThickness: 0.1
+    });
+
+    const heartMaterial = new THREE.MeshPhongMaterial({
+        color: 0xff69b4,
+        shininess: 100,
+        specular: 0x666666
+    });
+
+    heartModel = new THREE.Mesh(heartGeometry, heartMaterial);
+    heartModel.scale.set(0.2, 0.2, 0.2);
+    scene.add(heartModel);
 
 
     // Add floating hearts
@@ -190,33 +206,11 @@ function init3DScene() {
     messageBox.position.y = 2;
     scene.add(messageBox);
 
-
-    // Create heart model (from edited code)
-    const heartShape2 = new THREE.Shape();
-    heartShape2.moveTo(0, 0);
-    heartShape2.bezierCurveTo(0, 3, 3, 3, 3, 0);
-    heartShape2.bezierCurveTo(3, -1, 0, -2, 0, -3);
-    heartShape2.bezierCurveTo(0, -2, -3, -1, -3, 0);
-    heartShape2.bezierCurveTo(-3, 3, 0, 3, 0, 0);
-
-    const geometryHeart = new THREE.ExtrudeGeometry(heartShape2, {
-        depth: 0.5,
-        bevelEnabled: true,
-        bevelSegments: 3,
-        bevelSize: 0.1,
-        bevelThickness: 0.1
-    });
-
-    const materialHeart = new THREE.MeshPhongMaterial({
-        color: 0xff69b4,
-        shininess: 100,
-        specular: 0x666666
-    });
-
-    heartModel = new THREE.Mesh(geometryHeart, materialHeart);
-    heartModel.scale.set(0.2, 0.2, 0.2);
-    scene.add(heartModel);
-
+    // Add orbit controls
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.rotateSpeed = 0.5;
 
     // Handle window resize
     window.addEventListener('resize', onWindowResize);
@@ -279,6 +273,51 @@ function createHeartParticles() {
 }
 
 
+// Emit particles from heart on click
+function emitLoveParticles() {
+    const count = 20;
+    for (let i = 0; i < count; i++) {
+        const particle = new THREE.Mesh(
+            new THREE.SphereGeometry(0.1, 8, 8),
+            new THREE.MeshBasicMaterial({
+                color: new THREE.Color().setHSL(Math.random() * 0.1 + 0.9, 1, 0.5),
+                transparent: true,
+                opacity: 1
+            })
+        );
+
+        // Start from heart position
+        particle.position.copy(heartModel.position);
+
+        // Add small random offset
+        particle.position.x += (Math.random() - 0.5) * 0.5;
+        particle.position.y += (Math.random() - 0.5) * 0.5;
+        particle.position.z += (Math.random() - 0.5) * 0.5;
+
+        scene.add(particle);
+        heartParticles.push(particle);
+
+        // Animate particle outward with GSAP
+        gsap.to(particle.position, {
+            x: particle.position.x + (Math.random() - 0.5) * 5,
+            y: particle.position.y + (Math.random() - 0.5) * 5,
+            z: particle.position.z + (Math.random() - 0.5) * 5,
+            duration: 2,
+            ease: "power3.out"
+        });
+
+        gsap.to(particle.material, {
+            opacity: 0,
+            duration: 2,
+            ease: "power2.in",
+            onComplete: () => {
+                scene.remove(particle);
+                particle.geometry.dispose();
+                particle.material.dispose();
+            }
+        });
+    }
+}
 
 // Click event handler
 function onRingClick() {
@@ -329,54 +368,6 @@ function onRingClick() {
         duration: duration,
         ease: "power2.inOut"
     });
-}
-
-// Emit particles from heart on click
-function emitLoveParticles() {
-    const count = 20;
-    const particles = [];
-
-    for (let i = 0; i < count; i++) {
-        const particle = new THREE.Mesh(
-            new THREE.SphereGeometry(0.1, 8, 8),
-            new THREE.MeshBasicMaterial({
-                color: new THREE.Color().setHSL(Math.random() * 0.1 + 0.9, 1, 0.5),
-                transparent: true,
-                opacity: 1
-            })
-        );
-
-        // Start from heart position
-        particle.position.copy(heartModel.position);
-
-        // Add small random offset
-        particle.position.x += (Math.random() - 0.5) * 0.5;
-        particle.position.y += (Math.random() - 0.5) * 0.5;
-        particle.position.z += (Math.random() - 0.5) * 0.5;
-
-        scene.add(particle);
-        heartParticles.push(particle);
-
-        // Animate particle outward with GSAP
-        gsap.to(particle.position, {
-            x: particle.position.x + (Math.random() - 0.5) * 5,
-            y: particle.position.y + (Math.random() - 0.5) * 5,
-            z: particle.position.z + (Math.random() - 0.5) * 5,
-            duration: 2,
-            ease: "power3.out"
-        });
-
-        gsap.to(particle.material, {
-            opacity: 0,
-            duration: 2,
-            ease: "power2.in",
-            onComplete: () => {
-                scene.remove(particle);
-                particle.geometry.dispose();
-                particle.material.dispose();
-            }
-        });
-    }
 }
 
 // Play random love sound on interaction
@@ -724,4 +715,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Make functions available globally
 window.init3DScene = init3DScene;
-window.pulseHeartAnimation = onRingClick; //Update to use the new click handler
+window.pulseHeartAnimation = onRingClick;
