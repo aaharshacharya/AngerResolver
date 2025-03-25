@@ -3,10 +3,12 @@
 
 // Global variables
 let scene, camera, renderer, controls;
+let ring1, ring2, ringBox;
+let isAnimating = false;
+let messageBox;
 let heartModel, clock, mixer;
 let heartParticles = [];
 let canvasContainer;
-let ring;
 let floatingHearts = [];
 
 // Create floating heart geometries
@@ -88,6 +90,11 @@ function animate() {
         }
     });
 
+    // Gentle floating animation for message box
+    if (messageBox) {
+        messageBox.position.y = 2 + Math.sin(Date.now() * 0.001) * 0.1;
+    }
+
     if (renderer && scene && camera) {
         renderer.render(scene, camera);
     }
@@ -133,6 +140,7 @@ function init3DScene() {
     directionalLight.castShadow = true;
     scene.add(directionalLight);
 
+
     // Add floating hearts
     for (let i = 0; i < 10; i++) {
         createFloatingHeart();
@@ -141,12 +149,54 @@ function init3DScene() {
     // Add ring
     createRing();
 
+    // Create rings
+    const ringGeometry = new THREE.TorusGeometry(0.5, 0.05, 16, 100);
+    const goldMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffd700,
+        metalness: 0.8,
+        roughness: 0.2
+    });
+
+    ring1 = new THREE.Mesh(ringGeometry, goldMaterial);
+    ring2 = new THREE.Mesh(ringGeometry.clone(), goldMaterial.clone());
+
+    ring1.position.x = -1.5;
+    ring2.position.x = 1.5;
+
+    scene.add(ring1);
+    scene.add(ring2);
+
+    // Create message box
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 512;
+    canvas.height = 128;
+
+    context.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.font = '32px Arial';
+    context.fillStyle = '#ff69b4';
+    context.textAlign = 'center';
+    context.fillText('Click to exchange rings!', canvas.width/2, canvas.height/2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const material = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true
+    });
+
+    const geometry = new THREE.PlaneGeometry(3, 0.75);
+    messageBox = new THREE.Mesh(geometry, material);
+    messageBox.position.y = 2;
+    scene.add(messageBox);
+
+
     // Handle window resize
     window.addEventListener('resize', onWindowResize);
 
     // Start animation loop
     animate();
-
 
     // Create a 3D heart shape -  Modified to use the new heart creation method.
     const heartShape = new THREE.Shape();
@@ -159,7 +209,7 @@ function init3DScene() {
     heartShape.bezierCurveTo(x + 0.6, y + 0.4, x + 0.6, y + 1, x + 0, y + 1);
     heartShape.bezierCurveTo(x - 0.4, y + 1, x - 0.5, y + 0.5, x - 0.5, y + 0.5);
 
-    const geometry = new THREE.ExtrudeGeometry(heartShape, {
+    const geometryHeart = new THREE.ExtrudeGeometry(heartShape, {
         depth: 0.2,
         bevelEnabled: true,
         bevelSegments: 3,
@@ -167,21 +217,21 @@ function init3DScene() {
         bevelThickness: 0.1
     });
 
-    const material = new THREE.MeshPhongMaterial({
+    const materialHeart = new THREE.MeshPhongMaterial({
         color: 0xff69b4,
         shininess: 100,
         specular: 0x666666
     });
 
-    heartModel = new THREE.Mesh(geometry, material);
+    heartModel = new THREE.Mesh(geometryHeart, materialHeart);
     scene.add(heartModel);
 
 
     // Create particles
     createHeartParticles();
 
-    // Add click handler for the heart to trigger special animation
-    renderer.domElement.addEventListener('click', onHeartClick);
+    // Add click handler for the ring to trigger special animation
+    renderer.domElement.addEventListener('click', onRingClick);
 }
 
 // Handle window resizing
@@ -236,28 +286,54 @@ function createHeartParticles() {
 
 
 // Click event handler
-function onHeartClick() {
-    //Added pulse animation here to reflect the changes in the edited code
-    const originalScale = { x: heartModel.scale.x, y: heartModel.scale.y, z: heartModel.scale.z };
-    gsap.to(heartModel.scale, {
-        x: originalScale.x * 1.3,
-        y: originalScale.y * 1.3,
-        z: originalScale.z * 1.3,
-        duration: 0.3,
-        ease: "power2.out",
+function onRingClick() {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    // Update message
+    const canvas = messageBox.material.map.image;
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.font = '32px Arial';
+    context.fillStyle = '#ff69b4';
+    context.textAlign = 'center';
+    context.fillText('With this ring, I thee wed!', canvas.width/2, canvas.height/2);
+    messageBox.material.map.needsUpdate = true;
+
+    // Animate rings
+    const duration = 2;
+    gsap.to(ring1.position, {
+        x: 1.5,
+        y: 0.5,
+        duration: duration,
+        ease: "power2.inOut"
+    });
+
+    gsap.to(ring2.position, {
+        x: -1.5,
+        y: -0.5,
+        duration: duration,
+        ease: "power2.inOut",
         onComplete: () => {
-            gsap.to(heartModel.scale, {
-                x: originalScale.x,
-                y: originalScale.y,
-                z: originalScale.z,
-                duration: 0.5,
-                ease: "elastic.out(1, 0.3)"
-            });
+            isAnimating = false;
+            emitLoveParticles();
         }
     });
 
-    emitLoveParticles();
-    playLoveSound();
+    // Rotate rings
+    gsap.to(ring1.rotation, {
+        z: Math.PI * 2,
+        duration: duration,
+        ease: "power2.inOut"
+    });
+
+    gsap.to(ring2.rotation, {
+        z: -Math.PI * 2,
+        duration: duration,
+        ease: "power2.inOut"
+    });
 }
 
 // Emit particles from heart on click
@@ -653,4 +729,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Make functions available globally
 window.init3DScene = init3DScene;
-window.pulseHeartAnimation = onHeartClick; //Update to use the new click handler
+window.pulseHeartAnimation = onRingClick; //Update to use the new click handler
