@@ -1,0 +1,343 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/3d-styles.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="card main-card">
+    <div class="card-body text-center">
+        <h1 class="animated-title">Long Distance Love <span class="emoji">💖</span></h1>
+        <div class="subtitle bounce-animation">
+            <p>Bridging the distance, connecting our hearts...</p>
+        </div>
+        
+        <!-- 3D Heart Animation -->
+        <div id="canvas-container" class="canvas-container">
+            <div class="canvas-overlay">
+                <div class="canvas-tooltip">Click the heart to send love!</div>
+            </div>
+        </div>
+        
+        <!-- Countdown to Next Meeting -->
+        <div class="countdown-section">
+            <h2 class="countdown-title">Countdown Until We Meet</h2>
+            <div id="countdown-timer" class="countdown-timer">Loading countdown...</div>
+            <p class="countdown-label">Every second brings us closer together!</p>
+            
+            <div class="date-setter mt-3">
+                <input type="date" id="meeting-date" class="form-control meeting-date">
+                <button class="btn btn-primary mt-2" id="set-date">Set New Date</button>
+            </div>
+        </div>
+        
+        <!-- Love Message Creator -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3>Send a Special Message</h3>
+                <p class="text-muted">Write something sweet for your loved one</p>
+                
+                <div class="message-input-container">
+                    <textarea class="message-textarea" id="love-message" placeholder="Type your love message here..."></textarea>
+                    
+                    <div class="message-emoji-picker mt-2">
+                        <span class="message-emoji" data-emoji="❤️">❤️</span>
+                        <span class="message-emoji" data-emoji="😘">😘</span>
+                        <span class="message-emoji" data-emoji="🥰">🥰</span>
+                        <span class="message-emoji" data-emoji="💕">💕</span>
+                        <span class="message-emoji" data-emoji="💖">💖</span>
+                        <span class="message-emoji" data-emoji="💫">💫</span>
+                        <span class="message-emoji" data-emoji="🌙">🌙</span>
+                        <span class="message-emoji" data-emoji="✨">✨</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="send-message">
+                    <i class="fas fa-paper-plane me-2"></i> Send Message
+                </button>
+            </div>
+        </div>
+        
+        <!-- Features Grid -->
+        <div class="row g-4 mb-4">
+            <!-- Virtual Date Feature -->
+            <div class="col-md-4">
+                <div class="message-feature">
+                    <div class="message-feature-icon">
+                        <i class="fas fa-calendar-heart"></i>
+                    </div>
+                    <h3>Virtual Date</h3>
+                    <p>Plan a special online date with synchronized activities</p>
+                    <button class="feature-button" id="plan-date">Plan Now</button>
+                </div>
+            </div>
+            
+            <!-- Shared Playlist Feature -->
+            <div class="col-md-4">
+                <div class="message-feature">
+                    <div class="message-feature-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3>Shared Playlist</h3>
+                    <p>Create a playlist of your special songs together</p>
+                    <button class="feature-button" id="create-playlist">Create</button>
+                </div>
+            </div>
+            
+            <!-- Digital Gift Feature -->
+            <div class="col-md-4">
+                <div class="message-feature">
+                    <div class="message-feature-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h3>Digital Gift</h3>
+                    <p>Send a special surprise that shows how much you care</p>
+                    <a href="{{ url_for('choose') }}" class="feature-button">Choose Gift</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Shared Memories Wall -->
+        <div class="memories-section">
+            <h2 class="section-title">Our Memories</h2>
+            <p class="section-subtitle">Precious moments we've shared together</p>
+            
+            <div id="memories-container"></div>
+        </div>
+        
+        <!-- Shared Activities -->
+        <div class="activities-section">
+            <h2 class="section-title">Things To Do Together</h2>
+            <p class="section-subtitle">Distance doesn't mean we can't share experiences</p>
+            
+            <div id="activities-container"></div>
+        </div>
+        
+        <!-- Special Messages -->
+        <div class="card mt-4">
+            <div class="card-body text-center">
+                <h3>Daily Affirmation</h3>
+                <p id="daily-message" class="love-quote">
+                    "Distance means so little when someone means so much. I love you more than words can express."
+                </p>
+                <button class="btn btn-sm btn-primary" id="new-affirmation">
+                    <i class="fas fa-sync me-1"></i> New Message
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/3d-animations.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up emoji picker
+        document.querySelectorAll('.message-emoji').forEach(emoji => {
+            emoji.addEventListener('click', function() {
+                const messageInput = document.getElementById('love-message');
+                messageInput.value += emoji.dataset.emoji;
+            });
+        });
+        
+        // Set up message sending
+        document.getElementById('send-message').addEventListener('click', function() {
+            const message = document.getElementById('love-message').value;
+            if (message.trim() !== '') {
+                // Simulate sending
+                const button = this;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Sending...';
+                
+                setTimeout(() => {
+                    // Show success
+                    button.innerHTML = '<i class="fas fa-check me-2"></i> Sent!';
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-success');
+                    
+                    // Show floating heart animation
+                    showFloatingHearts();
+                    
+                    // Reset after delay
+                    setTimeout(() => {
+                        document.getElementById('love-message').value = '';
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Send Message';
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-primary');
+                    }, 2000);
+                }, 1500);
+            }
+        });
+        
+        // Set up date setting
+        document.getElementById('set-date').addEventListener('click', function() {
+            const dateInput = document.getElementById('meeting-date');
+            if (dateInput.value) {
+                const newDate = new Date(dateInput.value);
+                // Store in localStorage
+                localStorage.setItem('nextMeetingDate', newDate.toISOString());
+                // Update countdown
+                initCountdownTimer(newDate);
+                
+                // Show confirmation
+                alert('Countdown updated! Looking forward to the special day! ❤️');
+            }
+        });
+        
+        // Initialize countdown from localStorage if available
+        const savedDate = localStorage.getItem('nextMeetingDate');
+        if (savedDate) {
+            initCountdownTimer(new Date(savedDate));
+        } else {
+            // Default to 30 days from now
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 30);
+            initCountdownTimer(defaultDate);
+        }
+        
+        // Set up daily affirmation button
+        document.getElementById('new-affirmation').addEventListener('click', function() {
+            const messages = [
+                "Every moment with you, even from afar, is the best moment of my day.",
+                "The stars shine brighter knowing that we're under the same sky.",
+                "My heart knows no distance when it comes to loving you.",
+                "With every beat of my heart, I send my love to you across the miles.",
+                "Distance is temporary, but our love is permanent.",
+                "I'm counting the days until I can hold you in my arms again.",
+                "In a world full of uncertainty, my love for you is the one constant.",
+                "Even miles apart, you're still my favorite place to be.",
+                "I carry your heart with me wherever I go.",
+                "When I think of you, distance disappears and all I feel is love."
+            ];
+            
+            const messageElement = document.getElementById('daily-message');
+            let newMessage = messages[Math.floor(Math.random() * messages.length)];
+            
+            // Make sure we don't repeat
+            while (newMessage === messageElement.textContent) {
+                newMessage = messages[Math.floor(Math.random() * messages.length)];
+            }
+            
+            // Animate message change
+            gsap.to(messageElement, {
+                opacity: 0,
+                y: -20,
+                duration: 0.5,
+                onComplete: () => {
+                    messageElement.textContent = newMessage;
+                    gsap.to(messageElement, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.5
+                    });
+                }
+            });
+        });
+        
+        // Function to update countdown timer
+        function initCountdownTimer(targetDate) {
+            const countdownElement = document.getElementById('countdown-timer');
+            if (!countdownElement || !targetDate) return;
+            
+            function updateCountdown() {
+                const currentDate = new Date();
+                const difference = targetDate - currentDate;
+                
+                if (difference < 0) {
+                    countdownElement.textContent = "It's time! ❤️";
+                    return;
+                }
+                
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                
+                countdownElement.textContent = `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+            }
+            
+            // Update immediately
+            updateCountdown();
+            
+            // Clear any existing intervals
+            if (window.countdownInterval) {
+                clearInterval(window.countdownInterval);
+            }
+            
+            // Update every second
+            window.countdownInterval = setInterval(updateCountdown, 1000);
+        }
+        
+        // Function to show floating hearts animation
+        function showFloatingHearts() {
+            const container = document.querySelector('.main-card');
+            const heartCount = 20;
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('floating-heart');
+                heart.innerHTML = '❤️';
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                heart.style.opacity = Math.random() * 0.5 + 0.5;
+                heart.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
+                
+                container.appendChild(heart);
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    heart.remove();
+                }, 5000);
+            }
+        }
+    });
+</script>
+
+<style>
+    .love-quote {
+        font-style: italic;
+        font-size: 1.2rem;
+        color: #ff3b69;
+        padding: 1rem;
+        border-radius: 10px;
+        background-color: rgba(255, 59, 105, 0.1);
+        margin: 1rem auto;
+        max-width: 80%;
+    }
+    
+    .section-title {
+        color: #ff3b69;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section-subtitle {
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+    
+    .meeting-date {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .floating-heart {
+        position: absolute;
+        font-size: 2rem;
+        pointer-events: none;
+        animation: floatUp 5s ease-out forwards;
+    }
+    
+    @keyframes floatUp {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-500px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+</style>
+{% endblock %}
