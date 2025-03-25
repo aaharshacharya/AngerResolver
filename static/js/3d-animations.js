@@ -32,7 +32,7 @@ function init3DScene() {
     canvasContainer.appendChild(renderer.domElement);
     
     // Add orbit controls to move the heart with mouse/touch
-    controls = new OrbitControls(camera, renderer.domElement);
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.rotateSpeed = 0.5;
@@ -633,5 +633,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initSharedActivities();
 });
 
-// Export functions for use in other scripts
-export { init3DScene, pulseHeartAnimation };
+// Make functions available globally
+window.init3DScene = init3DScene;
+window.pulseHeartAnimation = pulseHeartAnimation;
