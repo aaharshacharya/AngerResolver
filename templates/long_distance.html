@@ -136,13 +136,20 @@
 <audio id="background-music" loop>
     <source src="{{ url_for('static', filename='audio/paaro.mp3') }}" type="audio/mp3">
 </audio>
-<script type="module" src="{{ url_for('static', filename='js/3d-animations.js') }}"></script>
+<script src="{{ url_for('static', filename='js/3d-animations.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const music = document.getElementById('background-music');
         document.body.addEventListener('click', function() {
             music.play().catch(err => console.log('Audio play error:', err));
         });
+        
+        // Initialize 3D scene when document is loaded
+        if (typeof init3DScene === 'function') {
+            init3DScene();
+        } else {
+            console.error('init3DScene function not available');
+        }
     });
 </script>
 <script>

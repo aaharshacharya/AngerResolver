@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body text-center">
+        <h1 class="animated-title">Choose a Gift <span class="emoji">🎁</span></h1>
+        <div class="subtitle">
+            <p>Pick something special or create your own!</p>
+        </div>
+        
+        <div class="gift-options mt-4">
+            <div class="row g-4">
+                <!-- Gift Option 1 -->
+                <div class="col-md-6">
+                    <div class="gift-card">
+                        <div class="gift-icon">
+                            <img src="{{ url_for('static', filename='images/gifts/gift1.webp') }}" alt="Teddy Bear" style="max-height: 120px;">
+                        </div>
+                        <h3>Teddy Bear</h3>
+                        <p>A cuddly companion to remind you of me</p>
+                        <form method="POST" action="{{ url_for('message') }}">
+                            <input type="hidden" name="gift" value="Teddy Bear">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-heart me-2"></i> Choose This
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Gift Option 2 -->
+                <div class="col-md-6">
+                    <div class="gift-card">
+                        <div class="gift-icon">
+                            <img src="{{ url_for('static', filename='images/gifts/gift2.png') }}" alt="Digital Flowers" style="max-height: 120px;">
+                        </div>
+                        <h3>Digital Flowers</h3>
+                        <p>Flowers that never wilt, just like my love</p>
+                        <form method="POST" action="{{ url_for('message') }}">
+                            <input type="hidden" name="gift" value="Digital Flowers">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-heart me-2"></i> Choose This
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Gift Option 3 -->
+                <div class="col-md-6">
+                    <div class="gift-card">
+                        <div class="gift-icon">
+                            <img src="{{ url_for('static', filename='images/gifts/ahatamatar.gif') }}" alt="Dancing Cat" style="max-height: 120px;">
+                        </div>
+                        <h3>Dancing Cat</h3>
+                        <p>A silly dancing cat to make you smile</p>
+                        <form method="POST" action="{{ url_for('message') }}">
+                            <input type="hidden" name="gift" value="Dancing Cat">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-heart me-2"></i> Choose This
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Custom Gift Option -->
+                <div class="col-md-6">
+                    <div class="gift-card custom-gift">
+                        <div class="gift-icon">
+                            <i class="fas fa-magic fa-3x"></i>
+                        </div>
+                        <h3>Create Your Own</h3>
+                        <p>Something more personal? Describe your perfect gift</p>
+                        <a href="{{ url_for('custom') }}" class="btn btn-primary">
+                            <i class="fas fa-wand-magic-sparkles me-2"></i> Create Custom
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Go Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add hover effects to gift cards
+        document.querySelectorAll('.gift-card').forEach(function(card) {
+            card.addEventListener('mouseenter', function() {
+                addPulseEffect(this);
+                playHoverSound();
+            });
+        });
+    });
+</script>
+{% endblock %}

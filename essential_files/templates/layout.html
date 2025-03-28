@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Across Distance</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Any additional head content for specific pages -->
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="main-container">
+        <div class="music-toggle">
+            <button id="music-btn" class="music-btn" title="Toggle Background Music">
+                <i class="fas fa-music"></i>
+            </button>
+        </div>
+        
+        <div class="hearts-container" id="hearts-container"></div>
+        <div class="balloons-container" id="balloons-container"></div>
+        
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+        
+        <footer class="text-center py-3">
+            <div class="container">
+                <p class="text-muted">Made with <i class="fas fa-heart text-danger"></i> for someone special</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Tone.js for Audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    
+    <!-- Three.js for 3D -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/music.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    <!-- Initialize scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize animations
+            initializeAnimations();
+            
+            // Initialize background music
+            initializeBackgroundMusic();
+            
+            // Add decorative elements
+            setTimeout(function() {
+                createHearts();
+                createBalloons();
+            }, 1000);
+            
+            // Add event listeners for message tags
+            document.querySelectorAll('.idea-tag').forEach(function(tag) {
+                tag.addEventListener('click', function() {
+                    const textarea = document.getElementById('message-text');
+                    if (textarea) {
+                        if (textarea.value) {
+                            textarea.value += ' ' + this.textContent;
+                        } else {
+                            textarea.value = this.textContent;
+                        }
+                    }
+                    playClickSound();
+                });
+            });
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

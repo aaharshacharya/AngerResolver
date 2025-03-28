@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body text-center">
+        <h1 class="animated-title">Add a Personal Message <span class="emoji">✉️</span></h1>
+        <div class="subtitle">
+            <p>You've chosen: <span class="chosen-gift">{{ gift }}</span></p>
+        </div>
+        
+        <div class="message-box mb-4">
+            <p>Now add a special message to go with your gift!</p>
+            <p class="hint">Your words mean everything...</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('final') }}">
+            <div class="form-floating mb-4">
+                <textarea class="form-control" id="message-text" name="message" style="height: 150px" placeholder="Your message..."></textarea>
+                <label for="message-text">Your personal message</label>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-muted mb-2">Need inspiration? Click on these phrases to add them:</p>
+                <div class="ideas-container">
+                    <span class="idea-tag">I'm so sorry</span>
+                    <span class="idea-tag">I miss your smile</span>
+                    <span class="idea-tag">You mean the world to me</span>
+                    <span class="idea-tag">Let's make up</span>
+                    <span class="idea-tag">I was wrong</span>
+                    <span class="idea-tag">I love you</span>
+                    <span class="idea-tag">Forever yours</span>
+                    <span class="idea-tag">You're amazing</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-lg btn-primary">
+                <i class="fas fa-paper-plane me-2"></i> Send My Gift
+            </button>
+        </form>
+        
+        <div class="mt-3">
+            <a href="{{ url_for('choose') }}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Choose Different Gift
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click events to idea tags
+        document.querySelectorAll('.idea-tag').forEach(function(tag) {
+            tag.addEventListener('click', function() {
+                const textarea = document.getElementById('message-text');
+                if (textarea) {
+                    if (textarea.value) {
+                        textarea.value += ' ' + this.textContent;
+                    } else {
+                        textarea.value = this.textContent;
+                    }
+                    // Focus the textarea after adding content
+                    textarea.focus();
+                    // Play sound effect
+                    playClickSound();
+                }
+            });
+            
+            // Add hover effect
+            tag.addEventListener('mouseenter', function() {
+                playHoverSound();
+                this.style.transform = 'scale(1.1)';
+            });
+            
+            tag.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Animate the title on page load
+        const title = document.querySelector('.animated-title');
+        title.classList.add('pulse-animation');
+        
+        // Add floating animation to chosen gift text
+        const giftText = document.querySelector('.chosen-gift');
+        if (giftText) {
+            giftText.classList.add('float-animation');
+        }
+    });
+</script>
+{% endblock %}

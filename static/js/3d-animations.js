@@ -1,5 +1,5 @@
 // 3D Animations for Long Distance Relationship Website
-// Note: We're using globally loaded THREE and gsap from our CDN includes
+// Using Three.js and GSAP for animations
 
 // Global variables
 let scene, camera, renderer, controls;
@@ -7,62 +7,138 @@ let heartModel, clock, mixer;
 let heartParticles = [];
 let canvasContainer;
 
+// Set up any initialization that needs to happen when the script loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('3D animations script loaded successfully');
+    // We'll call init3DScene from the HTML
+});
+
 // Initialize the 3D scene
 function init3DScene() {
+    console.log('Initializing 3D scene...');
+    
+    // Check if THREE.js is loaded
+    if (typeof THREE === 'undefined') {
+        console.error('THREE.js not loaded! Make sure the library is included before this script.');
+        showError3D();
+        return;
+    }
+    
+    // Check if GSAP is loaded
+    if (typeof gsap === 'undefined') {
+        console.error('GSAP not loaded! Make sure the library is included before this script.');
+        showError3D();
+        return;
+    }
+    
     // Get the container for the 3D scene
     canvasContainer = document.getElementById('canvas-container');
+    if (!canvasContainer) {
+        console.error('Canvas container not found! Make sure the element with id "canvas-container" exists.');
+        return;
+    }
+    
+    try {
+        // Create scene, camera, and renderer
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xfff0f5); // Light pink background
+        
+        // Create camera
+        camera = new THREE.PerspectiveCamera(75, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
+        camera.position.z = 5;
+        
+        // Create renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        
+        // Clear existing content and append renderer
+        canvasContainer.innerHTML = '';
+        canvasContainer.appendChild(renderer.domElement);
+        
+        // Add orbit controls to move the heart with mouse/touch
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.rotateSpeed = 0.5;
+        
+        // Add ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        // Add directional light
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+        
+        // Create a 3D heart shape
+        createHeart();
+        
+        // Create particles
+        createHeartParticles();
+        
+        // Add window resize handler
+        window.addEventListener('resize', onWindowResize);
+        
+        // Start animation loop
+        animate();
+        
+        // Add click handler for the heart to trigger special animation
+        renderer.domElement.addEventListener('click', () => {
+            pulseHeartAnimation();
+        });
+        
+        console.log('3D scene initialized successfully');
+    } catch (error) {
+        console.error('Error initializing 3D scene:', error);
+        showError3D();
+    }
+}
+
+// Show an error message when 3D initialization fails
+function showError3D() {
     if (!canvasContainer) return;
     
-    // Create scene, camera, and renderer
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xfff0f5); // Light pink background
+    canvasContainer.innerHTML = `
+        <div class="error-container">
+            <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3>3D Visualization Error</h3>
+            <p>We couldn't load the 3D heart animation. This might be due to browser compatibility issues or missing libraries.</p>
+            <p>Please try using a modern browser like Chrome, Firefox, or Edge.</p>
+        </div>
+    `;
     
-    // Create camera
-    camera = new THREE.PerspectiveCamera(75, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
-    camera.position.z = 5;
-    
-    // Create renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.shadowMap.enabled = true;
-    
-    // Clear existing content and append renderer
-    canvasContainer.innerHTML = '';
-    canvasContainer.appendChild(renderer.domElement);
-    
-    // Add orbit controls to move the heart with mouse/touch
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.rotateSpeed = 0.5;
-    
-    // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-    
-    // Add directional light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 5, 5);
-    directionalLight.castShadow = true;
-    scene.add(directionalLight);
-    
-    // Create a 3D heart shape
-    createHeart();
-    
-    // Create particles
-    createHeartParticles();
-    
-    // Add window resize handler
-    window.addEventListener('resize', onWindowResize);
-    
-    // Start animation loop
-    animate();
-    
-    // Add click handler for the heart to trigger special animation
-    renderer.domElement.addEventListener('click', () => {
-        pulseHeartAnimation();
-    });
+    // Add some simple styling
+    const style = document.createElement('style');
+    style.textContent = `
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 2rem;
+            text-align: center;
+            background-color: rgba(255, 105, 180, 0.1);
+            border-radius: 15px;
+        }
+        .error-icon {
+            font-size: 3rem;
+            color: #ff3b69;
+            margin-bottom: 1rem;
+        }
+        .error-container h3 {
+            color: #ff3b69;
+            margin-bottom: 1rem;
+        }
+        .error-container p {
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Create a 3D heart
@@ -193,6 +269,8 @@ function animate() {
 
 // Floating heart animation with GSAP
 function animateFloatingHeart() {
+    if (!heartModel || !gsap) return;
+    
     gsap.to(heartModel.position, {
         y: 0.2,
         duration: 2,
@@ -212,6 +290,8 @@ function animateFloatingHeart() {
 
 // Heart pulse animation triggered on click
 function pulseHeartAnimation() {
+    if (!heartModel || !gsap) return;
+    
     // Store original scale
     const originalScale = { x: heartModel.scale.x, y: heartModel.scale.y, z: heartModel.scale.z };
     
@@ -244,6 +324,8 @@ function pulseHeartAnimation() {
 
 // Emit particles from heart on click
 function emitLoveParticles() {
+    if (!heartModel || !scene || !THREE || !gsap) return;
+    
     const count = 20;
     const particles = [];
     
@@ -305,40 +387,46 @@ function playLoveSound() {
     
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
     
-    if (Tone && Tone.loaded) {
-        // Create a soft piano note
-        const synth = new Tone.Synth({
-            oscillator: {
-                type: "sine"
-            },
-            envelope: {
-                attack: 0.02,
-                decay: 0.2,
-                sustain: 0.2,
-                release: 1
-            }
-        }).toDestination();
-        
-        // Play a gentle note
-        synth.volume.value = -10;
-        synth.triggerAttackRelease("C5", "8n");
-        
-        // After short delay, play another note
-        setTimeout(() => {
-            synth.triggerAttackRelease("E5", "8n");
-        }, 200);
-        
-        setTimeout(() => {
-            synth.triggerAttackRelease("G5", "4n");
-        }, 400);
+    try {
+        if (typeof Tone !== 'undefined') {
+            // Create a soft piano note
+            const synth = new Tone.Synth({
+                oscillator: {
+                    type: "sine"
+                },
+                envelope: {
+                    attack: 0.02,
+                    decay: 0.2,
+                    sustain: 0.2,
+                    release: 1
+                }
+            }).toDestination();
+            
+            // Play a gentle note
+            synth.volume.value = -10;
+            synth.triggerAttackRelease("C5", "8n");
+            
+            // After short delay, play another note
+            setTimeout(() => {
+                synth.triggerAttackRelease("E5", "8n");
+            }, 200);
+            
+            setTimeout(() => {
+                synth.triggerAttackRelease("G5", "4n");
+            }, 400);
+        }
+    } catch (error) {
+        console.error('Error playing sound:', error);
     }
     
-    // Show message
+    // Show message regardless of sound playback
     showLoveMessage(randomMessage);
 }
 
 // Display a love message on screen
 function showLoveMessage(message) {
+    if (!canvasContainer || !gsap) return;
+    
     const messageElement = document.createElement('div');
     messageElement.classList.add('love-message');
     messageElement.textContent = message;
@@ -433,206 +521,86 @@ function initMemoryWall() {
         
         // Add click handler to upload image
         memoryCard.addEventListener('click', () => {
-            document.getElementById('memory-upload').click();
+            const uploadInput = document.getElementById('memory-upload');
+            if (uploadInput) {
+                uploadInput.click();
+            }
         });
     }
     
-    // Set up file upload handler
-    const uploadInput = document.createElement('input');
-    uploadInput.type = 'file';
-    uploadInput.id = 'memory-upload';
-    uploadInput.accept = 'image/*';
-    uploadInput.style.display = 'none';
-    
-    uploadInput.addEventListener('change', (event) => {
-        if (event.target.files && event.target.files[0]) {
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-                // Find first empty card
-                const emptyCard = document.querySelector('.memory-card:not(.filled)');
-                if (emptyCard) {
-                    emptyCard.classList.add('filled');
-                    emptyCard.innerHTML = `
-                        <div class="memory-image" style="background-image: url('${e.target.result}')"></div>
-                        <div class="memory-overlay">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                    `;
-                    
-                    // Add hover animation
-                    emptyCard.addEventListener('mouseenter', () => {
-                        gsap.to(emptyCard.querySelector('.memory-overlay'), {
-                            opacity: 1,
-                            duration: 0.3
-                        });
-                    });
-                    
-                    emptyCard.addEventListener('mouseleave', () => {
-                        gsap.to(emptyCard.querySelector('.memory-overlay'), {
-                            opacity: 0,
-                            duration: 0.3
-                        });
-                    });
-                }
-            };
-            
-            reader.readAsDataURL(event.target.files[0]);
-        }
-    });
-    
-    document.body.appendChild(uploadInput);
+    // Set up file upload handler if not already present
+    if (!document.getElementById('memory-upload')) {
+        const uploadInput = document.createElement('input');
+        uploadInput.type = 'file';
+        uploadInput.id = 'memory-upload';
+        uploadInput.accept = 'image/*';
+        uploadInput.style.display = 'none';
+        
+        uploadInput.addEventListener('change', (event) => {
+            if (event.target.files && event.target.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    // Find first empty card
+                    const emptyCard = document.querySelector('.memory-card:not(.filled)');
+                    if (emptyCard) {
+                        emptyCard.classList.add('filled');
+                        emptyCard.innerHTML = `
+                            <div class="memory-image" style="background-image: url('${e.target.result}')"></div>
+                            <div class="memory-overlay">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        `;
+                        
+                        // Add hover animation
+                        if (typeof gsap !== 'undefined') {
+                            emptyCard.addEventListener('mouseenter', () => {
+                                gsap.to(emptyCard.querySelector('.memory-overlay'), {
+                                    opacity: 1,
+                                    duration: 0.3
+                                });
+                            });
+                            
+                            emptyCard.addEventListener('mouseleave', () => {
+                                gsap.to(emptyCard.querySelector('.memory-overlay'), {
+                                    opacity: 0,
+                                    duration: 0.3
+                                });
+                            });
+                        }
+                    }
+                };
+                
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        });
+        
+        document.body.appendChild(uploadInput);
+    }
 }
 
 // Initialize shared activities
 function initSharedActivities() {
-    const activitiesContainer = document.getElementById('activities-container');
+    const activitiesContainer = document.querySelector('.activities-grid');
     if (!activitiesContainer) return;
     
-    const activities = [
-        { name: "Watch Movie Together", icon: "fa-film", color: "#e74c3c" },
-        { name: "Play Game", icon: "fa-gamepad", color: "#3498db" },
-        { name: "Virtual Date", icon: "fa-utensils", color: "#2ecc71" },
-        { name: "Listen to Music", icon: "fa-music", color: "#9b59b6" },
-        { name: "Star Gazing", icon: "fa-star", color: "#f39c12" },
-        { name: "Video Call", icon: "fa-video", color: "#1abc9c" }
-    ];
-    
-    activities.forEach(activity => {
-        const activityCard = document.createElement('div');
-        activityCard.classList.add('activity-card');
-        activityCard.style.backgroundColor = activity.color;
-        
-        activityCard.innerHTML = `
-            <i class="fas ${activity.icon}"></i>
-            <h3>${activity.name}</h3>
-        `;
-        
-        activitiesContainer.appendChild(activityCard);
-        
-        // Add hover effect
-        activityCard.addEventListener('mouseenter', () => {
-            gsap.to(activityCard, {
-                y: -10,
-                boxShadow: "0 15px 30px rgba(0,0,0,0.2)",
-                duration: 0.3
-            });
-        });
-        
-        activityCard.addEventListener('mouseleave', () => {
-            gsap.to(activityCard, {
-                y: 0,
-                boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
-                duration: 0.3
-            });
-        });
-        
-        // Add click animation
-        activityCard.addEventListener('click', () => {
-            // Visual feedback
-            gsap.to(activityCard.querySelector('i'), {
-                scale: 1.5,
-                duration: 0.2,
-                ease: "power2.out",
-                onComplete: () => {
-                    gsap.to(activityCard.querySelector('i'), {
-                        scale: 1,
-                        duration: 0.5,
-                        ease: "elastic.out(1, 0.3)"
-                    });
-                }
-            });
-            
-            // Show activity modal with details
-            showActivityModal(activity);
-        });
-    });
+    // Activities are already defined in HTML, no need to initialize them here
+    console.log('Activities section ready');
 }
 
-// Show activity details modal
-function showActivityModal(activity) {
-    // Create modal if it doesn't exist
-    let modal = document.getElementById('activity-modal');
-    
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'activity-modal';
-        modal.classList.add('activity-modal');
-        
-        document.body.appendChild(modal);
-    }
-    
-    // Update modal content
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="modal-header" style="background-color: ${activity.color}">
-                <i class="fas ${activity.icon} fa-3x"></i>
-                <h2>${activity.name}</h2>
-            </div>
-            <div class="modal-body">
-                <p>Plan a special ${activity.name.toLowerCase()} with your loved one!</p>
-                <div class="modal-action">
-                    <button class="btn-schedule">Schedule Now</button>
-                    <button class="btn-invite">Send Invitation</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Show modal with animation
-    gsap.fromTo(
-        modal,
-        { opacity: 0, display: 'flex' },
-        { opacity: 1, duration: 0.3 }
-    );
-    
-    gsap.fromTo(
-        modal.querySelector('.modal-content'),
-        { y: 50, scale: 0.9 },
-        { y: 0, scale: 1, duration: 0.4, ease: "back.out(1.7)" }
-    );
-    
-    // Add close handler
-    const closeButton = modal.querySelector('.close-modal');
-    closeButton.addEventListener('click', () => {
-        gsap.to(modal, {
-            opacity: 0,
-            duration: 0.3,
-            onComplete: () => {
-                modal.style.display = 'none';
-            }
-        });
-    });
-    
-    // Set up action buttons
-    const scheduleButton = modal.querySelector('.btn-schedule');
-    scheduleButton.addEventListener('click', () => {
-        alert(`${activity.name} scheduled! Looking forward to it 💕`);
-    });
-    
-    const inviteButton = modal.querySelector('.btn-invite');
-    inviteButton.addEventListener('click', () => {
-        alert(`Invitation for ${activity.name} sent to your loved one! 💌`);
-    });
-}
-
-// Initialize on load
+// Initialize on load (this ensures everything is loaded even if called externally)
 document.addEventListener('DOMContentLoaded', () => {
     // Try to initialize 3D scene
     if (typeof THREE !== 'undefined') {
-        init3DScene();
+        console.log('THREE.js is loaded, ready to initialize 3D scene');
     } else {
         console.error("THREE.js not loaded correctly");
     }
-    
-    // Initialize features
-    const nextMeetingDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Example: 30 days from now
-    initCountdownTimer(nextMeetingDate);
-    initMemoryWall();
-    initSharedActivities();
 });
 
 // Make functions available globally
 window.init3DScene = init3DScene;
 window.pulseHeartAnimation = pulseHeartAnimation;
+window.initCountdownTimer = initCountdownTimer;
+window.initMemoryWall = initMemoryWall;
+window.initSharedActivities = initSharedActivities;

@@ -55,6 +55,9 @@
 
 .countdown-title {
     color: #ff69b4;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
 
 .activities-grid {
     display: grid;
@@ -86,10 +89,6 @@
 .activity-item h4 {
     color: #333;
     margin: 0;
-}
-
-    margin-bottom: 1rem;
-    font-weight: bold;
 }
 
 .countdown-timer {
