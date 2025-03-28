@@ -2,6 +2,8 @@
 
 A beautiful interactive web application designed specifically for long-distance relationships. This application features an immersive 3D heart animation along with several features to help couples feel connected despite the physical distance.
 
+Repository created on: March 28, 2025
+
 ## Features
 
 - **Interactive 3D Heart**: A beautiful 3D heart with particles that reacts to user interaction
