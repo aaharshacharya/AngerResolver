@@ -48,7 +48,6 @@ An interactive web application designed to enhance long-distance relationships t
 - **Choose Gift**: Select from different gift options
 - **Message**: Create and customize messages
 - **Custom**: Create fully customized gifts and messages
-- **Final**: Display the final gift with special effects
 
 ## Deployment
 
