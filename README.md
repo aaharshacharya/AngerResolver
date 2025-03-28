@@ -1,4 +1,4 @@
-# Long Distance Love App
+# Long Distance Love Web Application 
 
 An interactive web application designed to enhance long-distance relationships through engaging, animated gift-sharing experiences.
 
@@ -8,7 +8,6 @@ An interactive web application designed to enhance long-distance relationships t
 - **Countdown Timer**: Track the days until your next meeting
 - **Memory Wall**: Share and display special memories together
 - **Custom Messaging**: Create and share personalized messages with animations
-- **Gift Selection**: Choose from a variety of virtual gifts to send to your partner
 - **Responsive Design**: Works on both desktop and mobile devices
 
 ## Technology Stack
